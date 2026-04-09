@@ -16,32 +16,33 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
-app.use((req, res, next) => {
-    console.log('Body:', req.body);
-    console.log('Content-Type:', req.get('Content-Type'));
-    next();
-});
 app.use(session({
     secret: process.env.SESSION_SECRET || 'jifs-fleet-secret-change-this',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false, // true in production with HTTPS
+        secure: false,
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 60 * 1000
     }
 }));
 
 // Routes
+const authRoutes = require('./routes/auth');
+const vehicleRoutes = require('./routes/vehicles');
+const supplierRoutes = require('./routes/suppliers');
+const expenseRoutes = require('./routes/expenses');
+const serviceRoutes = require('./routes/services');
+const partRoutes = require('./routes/parts');
+const reportRoutes = require('./routes/reports');
 
-// AUTH ROUTE
-const authRoutes = require('./routes/auth') 
-const vehicleRoutes = require('./routes/vehicles')
-
-app.use('/api/auth', authRoutes)
+app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
-
-
+app.use('/api/suppliers', supplierRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/services', serviceRoutes);
+app.use('/api/parts', partRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Test route
 app.get('/', (req, res) => {
