@@ -11,37 +11,43 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
         const totalSuppliers = db.prepare('SELECT COUNT(*) as count FROM suppliers').get();
         const totalExpenses = db.prepare('SELECT SUM(debit) as total FROM expenses').get();
         const totalCredits = db.prepare('SELECT SUM(credit) as total FROM expenses').get();
-        
+
         // Expenses this month
         const monthExpenses = db.prepare(`
-            SELECT SUM(debit) as total FROM expenses 
+            SELECT SUM(debit) as total FROM expenses
             WHERE date >= date('now', 'start of month')
         `).get();
-        
-        // Upcoming services (next 30 days)
+
+        // Upcoming services (next 30 days) — return actual records
         const upcomingServices = db.prepare(`
-            SELECT COUNT(*) as count FROM services
-            WHERE next_service_date IS NOT NULL
-            AND next_service_date <= date('now', '+30 days')
-            AND next_service_date >= date('now')
-        `).get();
-        
-        // Expiring parts (next 30 days)
+            SELECT s.description, s.next_service_date, v.plate_no
+            FROM services s
+            JOIN vehicles v ON s.vehicle_id = v.id
+            WHERE s.next_service_date IS NOT NULL
+            AND s.next_service_date <= date('now', '+30 days')
+            AND s.next_service_date >= date('now')
+            ORDER BY s.next_service_date ASC
+        `).all();
+
+        // Expiring parts (next 30 days) — return actual records
         const expiringParts = db.prepare(`
-            SELECT COUNT(*) as count FROM parts
-            WHERE expiry_date IS NOT NULL
-            AND expiry_date <= date('now', '+30 days')
-            AND expiry_date >= date('now')
-        `).get();
-        
+            SELECT p.part_name, p.expiry_date, v.plate_no
+            FROM parts p
+            JOIN vehicles v ON p.vehicle_id = v.id
+            WHERE p.expiry_date IS NOT NULL
+            AND p.expiry_date <= date('now', '+30 days')
+            AND p.expiry_date >= date('now')
+            ORDER BY p.expiry_date ASC
+        `).all();
+
         res.json({
-            vehicles: totalVehicles.count,
-            suppliers: totalSuppliers.count,
+            activeVehicles: totalVehicles.count,
+            totalSuppliers: totalSuppliers.count,
             totalDebit: totalExpenses.total || 0,
             totalCredit: totalCredits.total || 0,
             monthExpenses: monthExpenses.total || 0,
-            upcomingServices: upcomingServices.count,
-            expiringParts: expiringParts.count
+            upcomingServices,
+            expiringParts
         });
     } catch (error) {
         console.error('Dashboard error:', error);

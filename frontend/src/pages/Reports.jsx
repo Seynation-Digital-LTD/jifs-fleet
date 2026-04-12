@@ -32,13 +32,14 @@ const Reports = () => {
             if (reportType === 'date') {
                 setReportData(response.data.expenses || []);
                 setTotals({
-                    debit: response.data.totals?.total_debit || 0,
-                    credit: response.data.totals?.total_credit || 0
+                    debit: response.data.totalDebit || 0,
+                    credit: response.data.totalCredit || 0
                 });
             } else {
-                setReportData(response.data || []);
-                const totalDebit = response.data.reduce((sum, item) => sum + (item.total_debit || 0), 0);
-                const totalCredit = response.data.reduce((sum, item) => sum + (item.total_credit || 0), 0);
+                const rows = response.data.report || [];
+                setReportData(rows);
+                const totalDebit = rows.reduce((sum, item) => sum + (item.total_debit || 0), 0);
+                const totalCredit = rows.reduce((sum, item) => sum + (item.total_credit || 0), 0);
                 setTotals({ debit: totalDebit, credit: totalCredit });
             }
         } catch (error) {

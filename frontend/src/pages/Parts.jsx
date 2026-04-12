@@ -7,6 +7,7 @@ const Parts = () => {
     const [parts, setParts] = useState([]);
     const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState({
@@ -27,10 +28,10 @@ const Parts = () => {
                 api.get('/parts'),
                 api.get('/vehicles')
             ]);
-            setParts(partsRes.data);
-            setVehicles(vehiclesRes.data.filter(v => v.status === 'active'));
-        } catch (error) {
-            alert('Failed to fetch data');
+            setParts(partsRes.data.parts);
+            setVehicles(vehiclesRes.data.vehicles.filter(v => v.status === 'active'));
+        } catch {
+            setError('Failed to load parts. Please refresh the page.');
         } finally {
             setLoading(false);
         }
@@ -46,8 +47,8 @@ const Parts = () => {
             }
             fetchData();
             resetForm();
-        } catch (error) {
-            alert(error.response?.data?.error || 'Operation failed');
+        } catch (err) {
+            setError(err.response?.data?.error || 'Operation failed. Please try again.');
         }
     };
 
@@ -68,8 +69,8 @@ const Parts = () => {
         try {
             await api.delete(`/parts/${id}`);
             fetchData();
-        } catch (error) {
-            alert(error.response?.data?.error || 'Delete failed');
+        } catch (err) {
+            setError(err.response?.data?.error || 'Delete failed. Please try again.');
         }
     };
 
@@ -107,6 +108,23 @@ const Parts = () => {
 
     return (
         <div className="animate-fade-in">
+            {/* Error banner */}
+            {error && (
+                <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-6">
+                    <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                        </svg>
+                        <span className="text-sm">{error}</span>
+                    </div>
+                    <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            )}
+
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>

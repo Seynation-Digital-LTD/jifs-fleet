@@ -8,6 +8,11 @@ const Expenses = () => {
     const [vehicles, setVehicles] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filterType, setFilterType] = useState('');
+    const [filterDateFrom, setFilterDateFrom] = useState('');
+    const [filterDateTo, setFilterDateTo] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState({
@@ -34,11 +39,11 @@ const Expenses = () => {
                 api.get('/vehicles'),
                 api.get('/suppliers')
             ]);
-            setExpenses(expensesRes.data);
-            setVehicles(vehiclesRes.data.filter(v => v.status === 'active'));
-            setSuppliers(suppliersRes.data);
-        } catch (error) {
-            alert('Failed to fetch data');
+            setExpenses(expensesRes.data.expenses);
+            setVehicles(vehiclesRes.data.vehicles.filter(v => v.status === 'active'));
+            setSuppliers(suppliersRes.data.suppliers);
+        } catch {
+            setError('Failed to load expenses. Please refresh the page.');
         } finally {
             setLoading(false);
         }
@@ -61,7 +66,7 @@ const Expenses = () => {
             fetchData();
             resetForm();
         } catch (error) {
-            alert(error.response?.data?.error || 'Operation failed');
+            setError(error.response?.data?.error || 'Operation failed. Please try again.');
         }
     };
 
@@ -88,7 +93,7 @@ const Expenses = () => {
             await api.delete(`/expenses/${id}`);
             fetchData();
         } catch (error) {
-            alert(error.response?.data?.error || 'Delete failed');
+            setError(error.response?.data?.error || 'Delete failed. Please try again.');
         }
     };
 
@@ -122,6 +127,20 @@ const Expenses = () => {
         });
     };
 
+    const filteredExpenses = expenses.filter((e) => {
+        const q = searchQuery.toLowerCase();
+        if (q && !(
+            (e.plate_no || '').toLowerCase().includes(q) ||
+            (e.supplier_name || '').toLowerCase().includes(q) ||
+            (e.reference_no || '').toLowerCase().includes(q) ||
+            (e.notes || '').toLowerCase().includes(q)
+        )) return false;
+        if (filterType && e.expense_type !== filterType) return false;
+        if (filterDateFrom && e.date < filterDateFrom) return false;
+        if (filterDateTo && e.date > filterDateTo) return false;
+        return true;
+    });
+
     const typeColors = {
         fuel: 'badge-info',
         maintenance: 'badge-warning',
@@ -132,6 +151,23 @@ const Expenses = () => {
 
     return (
         <div className="animate-fade-in">
+            {/* Error banner */}
+            {error && (
+                <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-6">
+                    <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                        </svg>
+                        <span className="text-sm">{error}</span>
+                    </div>
+                    <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            )}
+
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>
@@ -155,6 +191,61 @@ const Expenses = () => {
                         </>
                     )}
                 </button>
+            </div>
+
+            {/* Filters */}
+            <div className="card p-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="relative">
+                        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder="Search vehicle, supplier, ref..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="input pl-9"
+                        />
+                    </div>
+                    <select
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                        className="input select"
+                    >
+                        <option value="">All Types</option>
+                        <option value="fuel">Fuel</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="insurance">Insurance</option>
+                        <option value="parts">Parts</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <input
+                        type="date"
+                        value={filterDateFrom}
+                        onChange={(e) => setFilterDateFrom(e.target.value)}
+                        className="input"
+                        title="From date"
+                    />
+                    <input
+                        type="date"
+                        value={filterDateTo}
+                        onChange={(e) => setFilterDateTo(e.target.value)}
+                        className="input"
+                        title="To date"
+                    />
+                </div>
+                {(searchQuery || filterType || filterDateFrom || filterDateTo) && (
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                        <p className="text-sm text-gray-500">{filteredExpenses.length} result{filteredExpenses.length !== 1 ? 's' : ''}</p>
+                        <button
+                            onClick={() => { setSearchQuery(''); setFilterType(''); setFilterDateFrom(''); setFilterDateTo(''); }}
+                            className="text-sm text-blue-600 hover:underline"
+                        >
+                            Clear filters
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Form */}
@@ -301,15 +392,19 @@ const Expenses = () => {
                     <div className="flex items-center justify-center py-12">
                         <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
-                ) : expenses.length === 0 ? (
+                ) : filteredExpenses.length === 0 ? (
                     <div className="text-center py-12">
                         <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <p className="text-gray-500 mb-2">No expenses found</p>
-                        <button onClick={() => setShowForm(true)} className="text-blue-600 font-medium hover:underline">
-                            Record your first expense
-                        </button>
+                        <p className="text-gray-500 mb-2">
+                            {expenses.length === 0 ? 'No expenses found' : 'No expenses match your filters'}
+                        </p>
+                        {expenses.length === 0 && (
+                            <button onClick={() => setShowForm(true)} className="text-blue-600 font-medium hover:underline">
+                                Record your first expense
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
@@ -327,7 +422,7 @@ const Expenses = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {expenses.map((expense) => (
+                                {filteredExpenses.map((expense) => (
                                     <tr key={expense.id}>
                                         <td className="text-gray-600">{formatDate(expense.date)}</td>
                                         <td className="text-gray-600">{expense.reference_no || '-'}</td>

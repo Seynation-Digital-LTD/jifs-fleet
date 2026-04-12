@@ -6,6 +6,9 @@ const Vehicles = () => {
     const { user } = useAuth();
     const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filterStatus, setFilterStatus] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState({
@@ -23,9 +26,9 @@ const Vehicles = () => {
     const fetchVehicles = async () => {
         try {
             const response = await api.get('/vehicles');
-            setVehicles(response.data);
-        } catch (error) {
-            alert('Failed to fetch vehicles');
+            setVehicles(response.data.vehicles);
+        } catch {
+            setError('Failed to load vehicles. Please refresh the page.');
         } finally {
             setLoading(false);
         }
@@ -41,8 +44,8 @@ const Vehicles = () => {
             }
             fetchVehicles();
             resetForm();
-        } catch (error) {
-            alert(error.response?.data?.error || 'Operation failed');
+        } catch (err) {
+            setError(err.response?.data?.error || 'Operation failed. Please try again.');
         }
     };
 
@@ -63,8 +66,8 @@ const Vehicles = () => {
         try {
             await api.delete(`/vehicles/${id}`);
             fetchVehicles();
-        } catch (error) {
-            alert(error.response?.data?.error || 'Delete failed');
+        } catch (err) {
+            setError(err.response?.data?.error || 'Delete failed. Please try again.');
         }
     };
 
@@ -74,10 +77,38 @@ const Vehicles = () => {
         setShowForm(false);
     };
 
+    const filteredVehicles = vehicles.filter((v) => {
+        const q = searchQuery.toLowerCase();
+        if (q && !(
+            (v.plate_no || '').toLowerCase().includes(q) ||
+            (v.vehicle_type || '').toLowerCase().includes(q) ||
+            (v.make_model || '').toLowerCase().includes(q)
+        )) return false;
+        if (filterStatus && v.status !== filterStatus) return false;
+        return true;
+    });
+
     const isAdmin = user?.role === 'admin';
 
     return (
         <div className="animate-fade-in">
+            {/* Error banner */}
+            {error && (
+                <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-6">
+                    <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                        </svg>
+                        <span className="text-sm">{error}</span>
+                    </div>
+                    <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            )}
+
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>
@@ -105,6 +136,44 @@ const Vehicles = () => {
                             </>
                         )}
                     </button>
+                )}
+            </div>
+
+            {/* Filters */}
+            <div className="card p-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="relative">
+                        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder="Search plate, type, make/model..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="input pl-9"
+                        />
+                    </div>
+                    <select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        className="input select"
+                    >
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                {(searchQuery || filterStatus) && (
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                        <p className="text-sm text-gray-500">{filteredVehicles.length} result{filteredVehicles.length !== 1 ? 's' : ''}</p>
+                        <button
+                            onClick={() => { setSearchQuery(''); setFilterStatus(''); }}
+                            className="text-sm text-blue-600 hover:underline"
+                        >
+                            Clear filters
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -187,13 +256,15 @@ const Vehicles = () => {
                     <div className="flex items-center justify-center py-12">
                         <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
-                ) : vehicles.length === 0 ? (
+                ) : filteredVehicles.length === 0 ? (
                     <div className="text-center py-12">
                         <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 17h8M8 17v-4m8 4v-4m-8 0h8m-8 0V9a4 4 0 014-4h0a4 4 0 014 4v4" />
                         </svg>
-                        <p className="text-gray-500 mb-2">No vehicles found</p>
-                        {isAdmin && (
+                        <p className="text-gray-500 mb-2">
+                            {vehicles.length === 0 ? 'No vehicles found' : 'No vehicles match your filters'}
+                        </p>
+                        {vehicles.length === 0 && isAdmin && (
                             <button onClick={() => setShowForm(true)} className="text-blue-600 font-medium hover:underline">
                                 Add your first vehicle
                             </button>
@@ -212,7 +283,7 @@ const Vehicles = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {vehicles.map((vehicle) => (
+                            {filteredVehicles.map((vehicle) => (
                                 <tr key={vehicle.id}>
                                     <td className="font-medium text-gray-900">{vehicle.plate_no}</td>
                                     <td className="text-gray-600">{vehicle.vehicle_type || '-'}</td>
