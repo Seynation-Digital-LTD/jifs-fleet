@@ -10,6 +10,7 @@ import Expenses from './pages/Expenses';
 import Services from './pages/Services';
 import Parts from './pages/Parts';
 import Reports from './pages/Reports';
+import Statement from './pages/Statement';
 
 function App() {
     return (
@@ -61,7 +62,13 @@ function App() {
                             <Layout><Reports /></Layout>
                         </ProtectedRoute>
                     } />
-                    
+
+                    <Route path="/statement" element={
+                        <ProtectedRoute>
+                            <Layout><Statement /></Layout>
+                        </ProtectedRoute>
+                    } />
+
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
             </BrowserRouter>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../api/client';
 
 const Dashboard = () => {
@@ -121,13 +122,122 @@ const Dashboard = () => {
         }
     ];
 
+    const hasVehicles = (stats?.activeVehicles || 0) > 0;
+    const hasSuppliers = (stats?.totalSuppliers || 0) > 0;
+    const hasExpenses = (stats?.totalDebit || 0) > 0;
+    const setupComplete = hasVehicles && hasSuppliers;
+
     return (
         <div className="animate-fade-in">
             {/* Page header */}
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                <p className="text-gray-500 mt-1">Welcome back! Here's an overview of your fleet.</p>
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+                    <p className="text-gray-500 mt-1">Welcome back! Here's an overview of your fleet.</p>
+                </div>
+                {setupComplete && (
+                    <Link to="/expenses" className="btn btn-primary">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        New Transaction
+                    </Link>
+                )}
             </div>
+
+            {/* Quick Start — shown until vehicles + suppliers exist */}
+            {!setupComplete && (
+                <div className="card p-6 mb-8 border-2 border-dashed border-blue-200 bg-blue-50/50">
+                    <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="font-semibold text-blue-900 mb-1">Get started in 3 steps</h3>
+                            <p className="text-sm text-blue-700 mb-4">Complete these steps once and you'll be ready to log transactions and generate statements.</p>
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <Link
+                                    to="/vehicles"
+                                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-all ${hasVehicles ? 'border-green-400 bg-green-50 text-green-700' : 'border-blue-300 bg-white text-blue-700 hover:border-blue-500'}`}
+                                >
+                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${hasVehicles ? 'bg-green-400 text-white' : 'bg-blue-600 text-white'}`}>
+                                        {hasVehicles ? '✓' : '1'}
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-sm">Add your trucks</p>
+                                        <p className="text-xs opacity-70">Register each vehicle by plate number</p>
+                                    </div>
+                                </Link>
+                                <Link
+                                    to="/suppliers"
+                                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-all ${hasSuppliers ? 'border-green-400 bg-green-50 text-green-700' : 'border-blue-300 bg-white text-blue-700 hover:border-blue-500'}`}
+                                >
+                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${hasSuppliers ? 'bg-green-400 text-white' : 'bg-blue-600 text-white'}`}>
+                                        {hasSuppliers ? '✓' : '2'}
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-sm">Add your suppliers</p>
+                                        <p className="text-xs opacity-70">E.g. Said Salim Bakhresa & Co.</p>
+                                    </div>
+                                </Link>
+                                <Link
+                                    to="/expenses"
+                                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-all ${!setupComplete ? 'border-gray-200 bg-gray-50 text-gray-400 pointer-events-none' : 'border-blue-300 bg-white text-blue-700 hover:border-blue-500'}`}
+                                >
+                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${!setupComplete ? 'bg-gray-300 text-white' : 'bg-blue-600 text-white'}`}>
+                                        3
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-sm">Log transactions</p>
+                                        <p className="text-xs opacity-70">Record debits, credits, truck deliveries</p>
+                                    </div>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Quick actions — shown once setup is done */}
+            {setupComplete && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                    <Link to="/expenses" className="flex items-center gap-3 p-4 card hover:shadow-md transition-shadow group">
+                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                            <svg className="w-5 h-5 text-blue-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p className="font-semibold text-gray-900 text-sm">Log a Transaction</p>
+                            <p className="text-xs text-gray-500">Record a debit or credit entry</p>
+                        </div>
+                    </Link>
+                    <Link to="/statement" className="flex items-center gap-3 p-4 card hover:shadow-md transition-shadow group">
+                        <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-600 transition-colors">
+                            <svg className="w-5 h-5 text-emerald-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p className="font-semibold text-gray-900 text-sm">Print Statement</p>
+                            <p className="text-xs text-gray-500">Generate & print supplier ledger</p>
+                        </div>
+                    </Link>
+                    <Link to="/reports" className="flex items-center gap-3 p-4 card hover:shadow-md transition-shadow group">
+                        <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center group-hover:bg-violet-600 transition-colors">
+                            <svg className="w-5 h-5 text-violet-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p className="font-semibold text-gray-900 text-sm">View Reports</p>
+                            <p className="text-xs text-gray-500">Expenses by vehicle or type</p>
+                        </div>
+                    </Link>
+                </div>
+            )}
 
             {/* Stats grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">

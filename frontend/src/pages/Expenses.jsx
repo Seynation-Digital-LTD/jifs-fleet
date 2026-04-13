@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
 
@@ -19,8 +20,10 @@ const Expenses = () => {
         vehicle_id: '',
         supplier_id: '',
         date: new Date().toISOString().split('T')[0],
+        due_date: '',
         reference_no: '',
         expense_type: 'fuel',
+        item_description: '',
         quantity: '',
         unit: '',
         debit: '',
@@ -75,13 +78,16 @@ const Expenses = () => {
             vehicle_id: expense.vehicle_id,
             supplier_id: expense.supplier_id || '',
             date: expense.date,
+            due_date: expense.due_date || '',
             reference_no: expense.reference_no || '',
             expense_type: expense.expense_type,
+            item_description: expense.item_description || '',
             quantity: expense.quantity || '',
             unit: expense.unit || '',
             debit: expense.debit || '',
             credit: expense.credit || '',
-            notes: expense.notes || ''
+            notes: expense.notes || '',
+            document_no: expense.document_no || ''
         });
         setEditingId(expense.id);
         setShowForm(true);
@@ -102,8 +108,10 @@ const Expenses = () => {
             vehicle_id: '',
             supplier_id: '',
             date: new Date().toISOString().split('T')[0],
+            due_date: '',
             reference_no: '',
             expense_type: 'fuel',
+            item_description: '',
             quantity: '',
             unit: '',
             debit: '',
@@ -133,6 +141,8 @@ const Expenses = () => {
             (e.plate_no || '').toLowerCase().includes(q) ||
             (e.supplier_name || '').toLowerCase().includes(q) ||
             (e.reference_no || '').toLowerCase().includes(q) ||
+            (e.item_description || '').toLowerCase().includes(q) ||
+            (e.document_no || '').toLowerCase().includes(q) ||
             (e.notes || '').toLowerCase().includes(q)
         )) return false;
         if (filterType && e.expense_type !== filterType) return false;
@@ -255,6 +265,7 @@ const Expenses = () => {
                         {editingId ? 'Edit Expense' : 'Add New Expense'}
                     </h3>
                     <form onSubmit={handleSubmit}>
+                        {/* Row 1: Document No (read-only when editing), Vehicle, Supplier, Date, Due Date */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Vehicle *</label>
@@ -294,6 +305,30 @@ const Expenses = () => {
                                 />
                             </div>
                             <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Due Date</label>
+                                <input
+                                    type="date"
+                                    value={formData.due_date}
+                                    onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+                                    className="input"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Row 2: Document No (read-only when editing), Reference No, Type */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                            {editingId && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-1.5">Document No</label>
+                                    <input
+                                        type="text"
+                                        value={formData.document_no || ''}
+                                        readOnly
+                                        className="input bg-gray-50 text-gray-400 cursor-not-allowed"
+                                    />
+                                </div>
+                            )}
+                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Reference No</label>
                                 <input
                                     type="text"
@@ -303,8 +338,6 @@ const Expenses = () => {
                                     className="input"
                                 />
                             </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Type *</label>
                                 <select
@@ -320,6 +353,23 @@ const Expenses = () => {
                                     <option value="other">Other</option>
                                 </select>
                             </div>
+                        </div>
+
+                        {/* Item Description */}
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Item Description *</label>
+                            <input
+                                type="text"
+                                value={formData.item_description}
+                                onChange={(e) => setFormData({ ...formData, item_description: e.target.value })}
+                                placeholder="e.g. Diesel fuel for truck — Mombasa route"
+                                className="input"
+                                required
+                            />
+                        </div>
+
+                        {/* Row 3: Quantity, Unit, Debit, Credit */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Quantity</label>
                                 <input
@@ -364,6 +414,7 @@ const Expenses = () => {
                                 />
                             </div>
                         </div>
+
                         <div className="mt-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1.5">Notes</label>
                             <input
@@ -393,17 +444,46 @@ const Expenses = () => {
                         <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 ) : filteredExpenses.length === 0 ? (
-                    <div className="text-center py-12">
-                        <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p className="text-gray-500 mb-2">
-                            {expenses.length === 0 ? 'No expenses found' : 'No expenses match your filters'}
-                        </p>
-                        {expenses.length === 0 && (
-                            <button onClick={() => setShowForm(true)} className="text-blue-600 font-medium hover:underline">
-                                Record your first expense
-                            </button>
+                    <div className="text-center py-12 px-6">
+                        {expenses.length === 0 && vehicles.length === 0 ? (
+                            <>
+                                <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p className="text-gray-700 font-medium mb-1">You need to set up your trucks first</p>
+                                <p className="text-gray-500 text-sm mb-4">Each transaction is linked to a truck. Add your vehicles before logging expenses.</p>
+                                <Link to="/vehicles" className="btn btn-primary inline-flex">
+                                    Go to Vehicles →
+                                </Link>
+                            </>
+                        ) : expenses.length === 0 && suppliers.length === 0 ? (
+                            <>
+                                <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p className="text-gray-700 font-medium mb-1">Add at least one supplier</p>
+                                <p className="text-gray-500 text-sm mb-4">You need a supplier (e.g. Said Salim Bakhresa) before you can log a transaction.</p>
+                                <Link to="/suppliers" className="btn btn-primary inline-flex">
+                                    Go to Suppliers →
+                                </Link>
+                            </>
+                        ) : expenses.length === 0 ? (
+                            <>
+                                <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p className="text-gray-500 mb-2">No transactions yet</p>
+                                <button onClick={() => setShowForm(true)} className="text-blue-600 font-medium hover:underline">
+                                    Record your first transaction
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p className="text-gray-500">No transactions match your filters</p>
+                            </>
                         )}
                     </div>
                 ) : (
@@ -412,9 +492,11 @@ const Expenses = () => {
                             <thead>
                                 <tr>
                                     <th>Date</th>
+                                    <th>Doc No</th>
                                     <th>Ref No</th>
                                     <th>Vehicle</th>
                                     <th>Supplier</th>
+                                    <th>Description</th>
                                     <th>Type</th>
                                     <th className="text-right">Debit</th>
                                     <th className="text-right">Credit</th>
@@ -425,9 +507,11 @@ const Expenses = () => {
                                 {filteredExpenses.map((expense) => (
                                     <tr key={expense.id}>
                                         <td className="text-gray-600">{formatDate(expense.date)}</td>
+                                        <td className="text-gray-500 text-xs font-mono">{expense.document_no || '-'}</td>
                                         <td className="text-gray-600">{expense.reference_no || '-'}</td>
                                         <td className="font-medium text-gray-900">{expense.plate_no}</td>
                                         <td className="text-gray-600">{expense.supplier_name || '-'}</td>
+                                        <td className="text-gray-700 max-w-48 truncate" title={expense.item_description}>{expense.item_description || '-'}</td>
                                         <td>
                                             <span className={`badge ${typeColors[expense.expense_type]}`}>
                                                 {expense.expense_type}
