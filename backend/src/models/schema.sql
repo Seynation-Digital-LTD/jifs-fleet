@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
     make_model TEXT,
     year INTEGER,
     status TEXT CHECK(status IN ('active', 'inactive')) DEFAULT 'active',
+    monthly_budget REAL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -42,12 +43,28 @@ CREATE TABLE IF NOT EXISTS expenses (
     unit TEXT,
     debit REAL DEFAULT 0,
     credit REAL DEFAULT 0,
+    odometer_km REAL,
+    payment_status TEXT CHECK(payment_status IN ('unpaid', 'partial', 'paid')) DEFAULT 'unpaid',
     notes TEXT,
     created_by INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(id),
     FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
     FOREIGN KEY (created_by) REFERENCES users(id)
+);
+
+-- Vehicle documents table (TRA sticker, road licence, insurance, etc.)
+CREATE TABLE IF NOT EXISTS vehicle_documents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    vehicle_id INTEGER NOT NULL,
+    doc_type TEXT CHECK(doc_type IN ('tra_sticker', 'road_licence', 'psv_licence', 'insurance', 'goods_licence', 'other')) NOT NULL,
+    doc_name TEXT,
+    doc_number TEXT,
+    issue_date DATE,
+    expiry_date DATE,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
 );
 
 -- Services table

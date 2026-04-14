@@ -9,6 +9,7 @@ import Suppliers from './pages/Suppliers';
 import Expenses from './pages/Expenses';
 import Services from './pages/Services';
 import Parts from './pages/Parts';
+import Documents from './pages/Documents';
 import Reports from './pages/Reports';
 import Statement from './pages/Statement';
 
@@ -18,56 +19,17 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/login" element={<Login />} />
-                    
                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                    
-                    <Route path="/dashboard" element={
-                        <ProtectedRoute>
-                            <Layout><Dashboard /></Layout>
-                        </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/vehicles" element={
-                        <ProtectedRoute>
-                            <Layout><Vehicles /></Layout>
-                        </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/suppliers" element={
-                        <ProtectedRoute>
-                            <Layout><Suppliers /></Layout>
-                        </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/expenses" element={
-                        <ProtectedRoute>
-                            <Layout><Expenses /></Layout>
-                        </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/services" element={
-                        <ProtectedRoute>
-                            <Layout><Services /></Layout>
-                        </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/parts" element={
-                        <ProtectedRoute>
-                            <Layout><Parts /></Layout>
-                        </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/reports" element={
-                        <ProtectedRoute>
-                            <Layout><Reports /></Layout>
-                        </ProtectedRoute>
-                    } />
 
-                    <Route path="/statement" element={
-                        <ProtectedRoute>
-                            <Layout><Statement /></Layout>
-                        </ProtectedRoute>
-                    } />
+                    <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+                    <Route path="/vehicles" element={<ProtectedRoute><Layout><Vehicles /></Layout></ProtectedRoute>} />
+                    <Route path="/suppliers" element={<ProtectedRoute><Layout><Suppliers /></Layout></ProtectedRoute>} />
+                    <Route path="/expenses" element={<ProtectedRoute><Layout><Expenses /></Layout></ProtectedRoute>} />
+                    <Route path="/services" element={<ProtectedRoute><Layout><Services /></Layout></ProtectedRoute>} />
+                    <Route path="/parts" element={<ProtectedRoute><Layout><Parts /></Layout></ProtectedRoute>} />
+                    <Route path="/documents" element={<ProtectedRoute><Layout><Documents /></Layout></ProtectedRoute>} />
+                    <Route path="/reports" element={<ProtectedRoute><Layout><Reports /></Layout></ProtectedRoute>} />
+                    <Route path="/statement" element={<ProtectedRoute><Layout><Statement /></Layout></ProtectedRoute>} />
 
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>

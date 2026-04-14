@@ -35,6 +35,7 @@ const expenseRoutes = require('./routes/expenses');
 const serviceRoutes = require('./routes/services');
 const partRoutes = require('./routes/parts');
 const reportRoutes = require('./routes/reports');
+const documentRoutes = require('./routes/documents');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
@@ -43,6 +44,7 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/parts', partRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/documents', documentRoutes);
 
 // Test route
 app.get('/', (req, res) => {

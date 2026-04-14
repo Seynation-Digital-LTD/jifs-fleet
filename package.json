@@ -5,5 +5,8 @@
   "scripts": {
     "dev": "nodemon src/app.js",
     "start": "node src/app.js"
-}
+  },
+  "dependencies": {
+    "puppeteer-core": "^24.40.0"
+  }
 }

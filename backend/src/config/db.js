@@ -15,23 +15,31 @@ const initDb = () => {
     db.exec(schema);
     console.log('Database initialized');
 
-    // Migrate expenses table — add new columns if they don't exist
-    const existingColumns = db.pragma('table_info(expenses)').map(col => col.name);
-
-    const migrations = [
-        { name: 'document_no', sql: 'ALTER TABLE expenses ADD COLUMN document_no TEXT' },
-        { name: 'due_date',    sql: 'ALTER TABLE expenses ADD COLUMN due_date DATE' },
-        { name: 'item_description', sql: 'ALTER TABLE expenses ADD COLUMN item_description TEXT' }
+    // Migrate expenses table
+    const expenseColumns = db.pragma('table_info(expenses)').map(col => col.name);
+    const expenseMigrations = [
+        { name: 'document_no',     sql: 'ALTER TABLE expenses ADD COLUMN document_no TEXT' },
+        { name: 'due_date',        sql: 'ALTER TABLE expenses ADD COLUMN due_date DATE' },
+        { name: 'item_description',sql: 'ALTER TABLE expenses ADD COLUMN item_description TEXT' },
+        { name: 'odometer_km',     sql: 'ALTER TABLE expenses ADD COLUMN odometer_km REAL' },
+        { name: 'payment_status',  sql: "ALTER TABLE expenses ADD COLUMN payment_status TEXT DEFAULT 'unpaid'" },
     ];
+    for (const m of expenseMigrations) {
+        if (!expenseColumns.includes(m.name)) {
+            try { db.exec(m.sql); console.log(`Migration: added expenses.${m.name}`); }
+            catch (err) { console.error(`Migration error expenses.${m.name}:`, err.message); }
+        }
+    }
 
-    for (const migration of migrations) {
-        if (!existingColumns.includes(migration.name)) {
-            try {
-                db.exec(migration.sql);
-                console.log(`Migration: added column ${migration.name} to expenses`);
-            } catch (err) {
-                console.error(`Migration error for column ${migration.name}:`, err.message);
-            }
+    // Migrate vehicles table
+    const vehicleColumns = db.pragma('table_info(vehicles)').map(col => col.name);
+    const vehicleMigrations = [
+        { name: 'monthly_budget', sql: 'ALTER TABLE vehicles ADD COLUMN monthly_budget REAL DEFAULT 0' },
+    ];
+    for (const m of vehicleMigrations) {
+        if (!vehicleColumns.includes(m.name)) {
+            try { db.exec(m.sql); console.log(`Migration: added vehicles.${m.name}`); }
+            catch (err) { console.error(`Migration error vehicles.${m.name}:`, err.message); }
         }
     }
 };

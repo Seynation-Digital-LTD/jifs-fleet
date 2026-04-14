@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JIFS Fleet Management System — User Guide</title>
+<style>
+  :root {
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --green: #16a34a;
+    --green-light: #f0fdf4;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --gray: #6b7280;
+    --gray-light: #f9fafb;
+    --border: #e5e7eb;
+    --text: #111827;
+    --text-muted: #6b7280;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: #fff;
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    color: white;
+    text-align: center;
+    padding: 60px 40px;
+    page-break-after: always;
+  }
+  .cover-logo {
+    width: 90px; height: 90px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 32px;
+    font-size: 42px;
+  }
+  .cover h1 { font-size: 42px; font-weight: 800; margin-bottom: 12px; }
+  .cover h2 { font-size: 22px; font-weight: 400; opacity: .85; margin-bottom: 40px; }
+  .cover-meta { opacity: .7; font-size: 14px; line-height: 2; }
+  .cover-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 999px;
+    padding: 6px 20px;
+    font-size: 13px;
+    margin-bottom: 40px;
+  }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 900px; margin: 0 auto; padding: 60px 40px; }
+
+  /* ── TOC ── */
+  .toc { page-break-after: always; }
+  .toc h2 { font-size: 28px; font-weight: 700; margin-bottom: 28px; color: var(--blue); border-bottom: 3px solid var(--blue); padding-bottom: 12px; }
+  .toc-section { margin-bottom: 8px; }
+  .toc-section a { text-decoration: none; color: var(--text); display: flex; justify-content: space-between; padding: 8px 12px; border-radius: 8px; transition: background .15s; }
+  .toc-section a:hover { background: var(--blue-light); color: var(--blue); }
+  .toc-section a .toc-num { color: var(--blue); font-weight: 700; margin-right: 12px; }
+  .toc-section a .toc-dots { flex: 1; border-bottom: 2px dotted var(--border); margin: 0 12px; position: relative; top: -4px; }
+  .toc-section a .toc-page { color: var(--text-muted); font-size: 13px; }
+
+  /* ── SECTION HEADERS ── */
+  .chapter {
+    page-break-before: always;
+    padding-top: 20px;
+  }
+  .chapter-header {
+    background: linear-gradient(135deg, var(--blue) 0%, #1d4ed8 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 32px 36px;
+    margin-bottom: 36px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .chapter-icon {
+    width: 60px; height: 60px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .chapter-header h2 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+  .chapter-header p { opacity: .85; font-size: 15px; }
+  .chapter-num { font-size: 13px; opacity: .7; font-weight: 500; margin-bottom: 4px; }
+
+  h3 { font-size: 19px; font-weight: 700; color: var(--text); margin: 32px 0 12px; }
+  h4 { font-size: 16px; font-weight: 600; color: var(--text); margin: 20px 0 8px; }
+  p { margin-bottom: 14px; color: #374151; }
+
+  /* ── SCREENSHOT PLACEHOLDER ── */
+  .screenshot {
+    background: var(--gray-light);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 40px 24px;
+    text-align: center;
+    margin: 20px 0 28px;
+    position: relative;
+  }
+  .screenshot::before {
+    content: '📸';
+    display: block;
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  .screenshot-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 4px;
+  }
+  .screenshot-desc {
+    font-size: 14px;
+    color: #9ca3af;
+    font-style: italic;
+  }
+
+  /* ── STEPS ── */
+  .steps { list-style: none; margin: 16px 0 24px; }
+  .steps li {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    background: var(--blue);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-content { flex: 1; }
+  .step-content strong { display: block; margin-bottom: 2px; }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .callout-content { flex: 1; }
+  .callout-content strong { display: block; margin-bottom: 4px; }
+  .callout-content p { margin-bottom: 0; font-size: 14px; }
+
+  .callout.tip { background: var(--blue-light); border-left: 4px solid var(--blue); }
+  .callout.tip .callout-icon::after { content: '💡'; }
+  .callout.warning { background: var(--amber-light); border-left: 4px solid var(--amber); }
+  .callout.warning .callout-icon::after { content: '⚠️'; }
+  .callout.success { background: var(--green-light); border-left: 4px solid var(--green); }
+  .callout.success .callout-icon::after { content: '✅'; }
+  .callout.danger { background: var(--red-light); border-left: 4px solid var(--red); }
+  .callout.danger .callout-icon::after { content: '🚫'; }
+
+  /* ── FIELD TABLE ── */
+  .field-table { width: 100%; border-collapse: collapse; margin: 16px 0 28px; font-size: 14px; }
+  .field-table th { background: #f3f4f6; text-align: left; padding: 10px 14px; font-weight: 600; border: 1px solid var(--border); }
+  .field-table td { padding: 10px 14px; border: 1px solid var(--border); vertical-align: top; }
+  .field-table tr:nth-child(even) td { background: #fafafa; }
+  .required { color: var(--red); font-weight: 700; }
+  .optional { color: var(--text-muted); font-size: 12px; }
+
+  /* ── INLINE LABELS ── */
+  .label {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .label-blue { background: #dbeafe; color: #1d4ed8; }
+  .label-green { background: #dcfce7; color: #15803d; }
+  .label-red { background: #fee2e2; color: #b91c1c; }
+  .label-amber { background: #fef3c7; color: #b45309; }
+  .label-gray { background: #f3f4f6; color: #374151; }
+
+  /* ── KEYBOARD SHORTCUT ── */
+  kbd {
+    display: inline-block;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 1px 8px;
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  /* ── TWO COLUMN ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+
+  /* ── WORKFLOW CARD ── */
+  .workflow {
+    background: var(--gray-light);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .workflow h4 { margin-top: 0; color: var(--blue); }
+
+  /* ── DIVIDER ── */
+  hr { border: none; border-top: 2px solid var(--border); margin: 36px 0; }
+
+  /* ── PRINT ── */
+  @media print {
+    .cover { min-height: auto; padding: 100px 60px; }
+    .chapter { page-break-before: always; }
+    .screenshot { break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+    body { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     COVER PAGE
+═══════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-logo">🚛</div>
+  <div class="cover-badge">Version 1.0 · April 2026</div>
+  <h1>JIFS Fleet Management System</h1>
+  <h2>Complete User Guide</h2>
+  <div class="cover-meta">
+    <p>Prepared for JIFS Company, Tanzania</p>
+    <p>Developed by Seynation Digital LTD</p>
+    <p style="margin-top:20px; opacity:.5;">This guide covers every feature of the system.<br/>No prior computer experience required.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TABLE OF CONTENTS
+═══════════════════════════════════════════════════════════════ -->
+<div class="page toc">
+  <h2>Table of Contents</h2>
+
+  <div class="toc-section"><a href="#ch1"><span><span class="toc-num">1.</span> Getting Started — Logging In</span><span class="toc-dots"></span><span class="toc-page">3</span></a></div>
+  <div class="toc-section"><a href="#ch2"><span><span class="toc-num">2.</span> Dashboard — Your Home Screen</span><span class="toc-dots"></span><span class="toc-page">4</span></a></div>
+  <div class="toc-section"><a href="#ch3"><span><span class="toc-num">3.</span> Vehicles — Managing Your Trucks</span><span class="toc-dots"></span><span class="toc-page">6</span></a></div>
+  <div class="toc-section"><a href="#ch4"><span><span class="toc-num">4.</span> Suppliers — Managing Your Suppliers</span><span class="toc-dots"></span><span class="toc-page">8</span></a></div>
+  <div class="toc-section"><a href="#ch5"><span><span class="toc-num">5.</span> Expenses — Recording Daily Transactions</span><span class="toc-dots"></span><span class="toc-page">10</span></a></div>
+  <div class="toc-section"><a href="#ch6"><span><span class="toc-num">6.</span> Print Statement — Supplier Reconciliation</span><span class="toc-dots"></span><span class="toc-page">14</span></a></div>
+  <div class="toc-section"><a href="#ch7"><span><span class="toc-num">7.</span> Services — Maintenance Tracking</span><span class="toc-dots"></span><span class="toc-page">16</span></a></div>
+  <div class="toc-section"><a href="#ch8"><span><span class="toc-num">8.</span> Parts — Spare Parts with Expiry</span><span class="toc-dots"></span><span class="toc-page">18</span></a></div>
+  <div class="toc-section"><a href="#ch9"><span><span class="toc-num">9.</span> Documents — Vehicle Documents & Licences</span><span class="toc-dots"></span><span class="toc-page">20</span></a></div>
+  <div class="toc-section"><a href="#ch10"><span><span class="toc-num">10.</span> Reports — Financial Analysis</span><span class="toc-dots"></span><span class="toc-page">22</span></a></div>
+  <div class="toc-section"><a href="#ch11"><span><span class="toc-num">11.</span> Daily Workflow — How to Use the System</span><span class="toc-dots"></span><span class="toc-page">26</span></a></div>
+  <div class="toc-section"><a href="#ch12"><span><span class="toc-num">12.</span> Common Questions &amp; Troubleshooting</span><span class="toc-dots"></span><span class="toc-page">28</span></a></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 1 — LOGGING IN
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch1">
+  <div class="chapter-header">
+    <div class="chapter-icon">🔐</div>
+    <div>
+      <div class="chapter-num">CHAPTER 1</div>
+      <h2>Getting Started — Logging In</h2>
+      <p>How to open the system and sign in to your account</p>
+    </div>
+  </div>
+
+  <h3>Opening the System</h3>
+  <p>The JIFS Fleet System runs directly on the office computer — no internet connection is needed. To open it:</p>
+
+  <ol class="steps">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>Open the web browser</strong>
+        Use Google Chrome or any browser on the office computer.
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Go to the system address</strong>
+        Type <kbd>http://localhost:5173</kbd> in the address bar at the top, then press <kbd>Enter</kbd>.
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>The Login page appears</strong>
+        You will see a form asking for your username and password.
+      </div>
+    </li>
+  </ol>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Login Page</div>
+    <div class="screenshot-desc">Shows the blue login form with JIFS Fleet logo, username field, password field, and "Sign In" button</div>
+  </div>
+
+  <h3>Signing In</h3>
+  <ol class="steps">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>Type your username</strong>
+        Click on the "Username" box and type your username (e.g. <em>admin</em>).
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Type your password</strong>
+        Click on the "Password" box and type your password. The characters will appear as dots for security.
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>Click "Sign In"</strong>
+        The system will take you straight to the Dashboard.
+      </div>
+    </li>
+  </ol>
+
+  <div class="callout tip"><span class="callout-icon"></span><div class="callout-content"><strong>Your session stays active for 24 hours</strong><p>You do not need to log in again each time you use the system within the same day. If you close the browser and reopen it the next day, you will need to sign in again.</p></div></div>
+
+  <h3>Signing Out</h3>
+  <p>When you are done for the day, click the red <strong>Logout</strong> button at the very bottom of the left-side menu. This keeps the system secure so other people cannot use your account.</p>
+
+  <h3>User Roles</h3>
+  <table class="field-table">
+    <tr><th>Role</th><th>What they can do</th></tr>
+    <tr><td><span class="label label-blue">Admin</span></td><td>Full access — add, edit, delete everything including vehicles and suppliers. Create other users.</td></tr>
+    <tr><td><span class="label label-gray">Operator</span></td><td>Can record expenses, services, and parts. Cannot delete records or add vehicles/suppliers.</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 2 — DASHBOARD
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch2">
+  <div class="chapter-header">
+    <div class="chapter-icon">📊</div>
+    <div>
+      <div class="chapter-num">CHAPTER 2</div>
+      <h2>Dashboard — Your Home Screen</h2>
+      <p>A quick overview of everything happening in your fleet</p>
+    </div>
+  </div>
+
+  <p>The Dashboard is the first page you see after logging in. It gives you a quick summary of the entire fleet at a glance — you do not need to click through every section to know the current status.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Full Dashboard</div>
+    <div class="screenshot-desc">Shows the 4 blue/green/red/amber stat cards at the top, quick action buttons, and the alerts panels below</div>
+  </div>
+
+  <h3>Summary Cards (Top Row)</h3>
+  <p>The four coloured boxes at the top give you the most important numbers:</p>
+
+  <table class="field-table">
+    <tr><th>Card</th><th>What it shows</th></tr>
+    <tr><td><span class="label label-blue">Active Vehicles</span></td><td>How many trucks are currently marked as active in the system.</td></tr>
+    <tr><td><span class="label label-green">Suppliers</span></td><td>Total number of suppliers registered.</td></tr>
+    <tr><td><span class="label label-red">Total Expenses</span></td><td>The grand total of all money spent (debited) across all time.</td></tr>
+    <tr><td><span class="label label-amber">This Month</span></td><td>Total expenses recorded this calendar month only.</td></tr>
+  </table>
+
+  <h3>Quick Action Buttons</h3>
+  <p>Three shortcut buttons appear once your vehicles and suppliers are set up:</p>
+  <ul style="margin: 10px 0 20px 20px; line-height: 2.2;">
+    <li><strong>Log a Transaction</strong> — Takes you directly to the Expenses page to record a new entry.</li>
+    <li><strong>Print Statement</strong> — Takes you to the supplier statement for printing or reconciliation.</li>
+    <li><strong>View Reports</strong> — Opens the full reports section.</li>
+  </ul>
+
+  <h3>Budget Warnings</h3>
+  <p>If you have set a monthly spending budget for a truck and that truck has spent 80% or more of the budget this month, a warning card appears automatically. It shows a progress bar and percentage so you can see at a glance which trucks are spending too much.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Budget Warning Card</div>
+    <div class="screenshot-desc">Shows an amber warning card with a progress bar for each truck that is near or over budget, with percentage displayed</div>
+  </div>
+
+  <h3>Alerts — Upcoming Services</h3>
+  <p>The purple panel shows trucks that have a scheduled service coming up within the next 30 days. Each row shows the truck plate number, what the service is, and the date it is due.</p>
+
+  <h3>Alerts — Expiring Parts</h3>
+  <p>The yellow panel shows spare parts that are expiring within 30 days. This reminds you to replace or renew them before they expire.</p>
+
+  <h3>Alerts — Vehicle Documents</h3>
+  <p>A red panel appears if any vehicle documents (like TRA sticker, road licence, or insurance) have expired or will expire within 60 days. Each row shows the truck, the document type, and how many days are left (or how many days ago it expired).</p>
+
+  <div class="callout warning"><span class="callout-icon"></span><div class="callout-content"><strong>Always check the Dashboard first</strong><p>Start every working day on the Dashboard. Any expired documents or overdue services will appear here as red alerts so nothing is missed.</p></div></div>
+
+  <h3>First-Time Setup Guidance</h3>
+  <p>If you have just installed the system and haven't added any trucks or suppliers yet, the Dashboard will show a blue "Get started in 3 steps" guide. It will walk you through: (1) Add trucks, (2) Add suppliers, (3) Log your first transaction. Follow these steps in order before doing anything else.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 3 — VEHICLES
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch3">
+  <div class="chapter-header">
+    <div class="chapter-icon">🚛</div>
+    <div>
+      <div class="chapter-num">CHAPTER 3</div>
+      <h2>Vehicles — Managing Your Trucks</h2>
+      <p>Register every truck in the fleet so transactions can be linked to them</p>
+    </div>
+  </div>
+
+  <div class="callout tip"><span class="callout-icon"></span><div class="callout-content"><strong>Do this first</strong><p>Before recording any expense, you must add your trucks here. Every expense must be linked to a vehicle.</p></div></div>
+
+  <h3>Viewing the Vehicle List</h3>
+  <p>Click <strong>Vehicles</strong> in the left-hand menu. You will see a table listing all registered trucks with their plate numbers, type, make/model, year, status, and monthly budget.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Vehicles List</div>
+    <div class="screenshot-desc">Shows the vehicles table with columns: Plate No, Type, Make/Model, Year, Status (green Active badge), Monthly Budget, and Edit/Delete buttons</div>
+  </div>
+
+  <h3>Adding a New Vehicle (Admin Only)</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><div class="step-content"><strong>Click "Add Vehicle"</strong> — the blue button in the top-right corner of the page.</div></li>
+    <li><div class="step-num">2</div><div class="step-content"><strong>A form opens below the button.</strong> Fill in the vehicle details.</div></li>
+    <li><div class="step-num">3</div><div class="step-content"><strong>Click "Create Vehicle"</strong> to save. The truck appears in the list immediately.</div></li>
+  </ol>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Add Vehicle Form</div>
+    <div class="screenshot-desc">Shows the white form card with six fields: Plate No, Vehicle Type, Make & Model, Year, Status dropdown, and Monthly Budget</div>
+  </div>
+
+  <h4>Field Guide</h4>
+  <table class="field-table">
+    <tr><th>Field</th><th>What to enter</th><th></th></tr>
+    <tr><td><strong>Plate No</strong></td><td>The vehicle's official plate number (e.g. T 123 ABC). Must be unique — no two vehicles can share the same plate.</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Vehicle Type</strong></td><td>What kind of vehicle it is, e.g. "Truck", "Tanker", "Van", "Pickup".</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Make &amp; Model</strong></td><td>The brand and model, e.g. "Mercedes Actros", "Isuzu FTR", "Toyota Hino".</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Year</strong></td><td>The year the vehicle was manufactured, e.g. 2019.</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Status</strong></td><td>Choose <em>Active</em> for vehicles currently in use. Choose <em>Inactive</em> for vehicles that are parked, being repaired, or sold.</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Monthly Budget (TZS)</strong></td><td>The maximum amount this truck is allowed to spend per month. If set, the Dashboard will warn you when spending reaches 80%. Leave blank if you do not want a budget limit.</td><td><span class="optional">Optional</span></td></tr>
+  </table>
+
+  <h3>Editing a Vehicle</h3>
+  <p>Click the <strong>Edit</strong> link next to any vehicle in the table. The same form opens, pre-filled with the current information. Make your changes and click <strong>Update Vehicle</strong>.</p>
+
+  <h3>Deactivating a Vehicle</h3>
+  <p>If a truck is no longer in service (sold, written off, or in long-term repair), do <strong>not</strong> delete it. Instead, edit it and change the Status to <span class="label label-red">Inactive</span>. This preserves all historical expense records linked to that truck.</p>
+
+  <div class="callout danger"><span class="callout-icon"></span><div class="callout-content"><strong>Cannot delete a vehicle with expenses</strong><p>If a truck has any expense records, the system will not allow you to delete it. This protects your historical data. Deactivate the vehicle instead.</p></div></div>
+
+  <h3>Searching and Filtering</h3>
+  <p>Use the search bar at the top of the list to quickly find a truck by plate number, type, or make/model. Use the <em>Status</em> dropdown to show only active or inactive trucks.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 4 — SUPPLIERS
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch4">
+  <div class="chapter-header">
+    <div class="chapter-icon">🏢</div>
+    <div>
+      <div class="chapter-num">CHAPTER 4</div>
+      <h2>Suppliers — Managing Your Suppliers</h2>
+      <p>Register the companies that supply fuel, maintenance, insurance, and other services</p>
+    </div>
+  </div>
+
+  <p>A supplier is any company or person you buy from or owe money to. Examples include fuel companies like Said Salim Bakhresa &amp; Co., garages for maintenance, or insurance companies. You must add a supplier before you can link it to an expense.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Suppliers List</div>
+    <div class="screenshot-desc">Shows the suppliers table with columns: Name, Contact, Type badge (Fuel/Maintenance/Insurance/Other), and Edit/Delete buttons</div>
+  </div>
+
+  <h3>Adding a Supplier</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><div class="step-content"><strong>Click "Add Supplier"</strong> in the top-right corner.</div></li>
+    <li><div class="step-num">2</div><div class="step-content"><strong>Fill in the form</strong> with the supplier's details.</div></li>
+    <li><div class="step-num">3</div><div class="step-content"><strong>Click "Create Supplier"</strong> to save.</div></li>
+  </ol>
+
+  <h4>Field Guide</h4>
+  <table class="field-table">
+    <tr><th>Field</th><th>What to enter</th><th></th></tr>
+    <tr><td><strong>Name</strong></td><td>The full name of the supplier, e.g. "Said Salim Bakhresa &amp; Co. Ltd".</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Contact</strong></td><td>Phone number, email address, or any contact information for this supplier.</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Type</strong></td><td>
+      Choose the category that best describes what they supply:<br/>
+      • <span class="label label-blue">Fuel</span> — petrol stations, fuel suppliers<br/>
+      • <span class="label label-amber">Maintenance</span> — garages, mechanics<br/>
+      • <span class="label label-green">Insurance</span> — insurance companies<br/>
+      • <span class="label label-gray">Other</span> — anything else
+    </td><td><span class="required">Required</span></td></tr>
+  </table>
+
+  <div class="callout tip"><span class="callout-icon"></span><div class="callout-content"><strong>Set up all suppliers before recording expenses</strong><p>You can still record an expense without a supplier, but linking each expense to the correct supplier lets you generate supplier statements and see exactly how much you owe each company.</p></div></div>
+
+  <h3>Viewing Supplier Balances</h3>
+  <p>To see how much JIFS currently owes each supplier (total debits minus total credits), go to <strong>Reports → Supplier Balances</strong>. This gives a full breakdown per supplier.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 5 — EXPENSES
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch5">
+  <div class="chapter-header">
+    <div class="chapter-icon">💰</div>
+    <div>
+      <div class="chapter-num">CHAPTER 5</div>
+      <h2>Expenses — Recording Daily Transactions</h2>
+      <p>The core of the system — record every debit and credit for each truck</p>
+    </div>
+  </div>
+
+  <p>The Expenses page is where you record every financial transaction — fuel purchases, maintenance costs, insurance payments, and any payments received from suppliers (credits). This is the page you will use most often.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Expenses Page — Table View</div>
+    <div class="screenshot-desc">Shows the expenses table with filter bar at top, and rows showing date, doc number, vehicle plate, supplier, description, debit/credit amounts, payment status badge, and action buttons</div>
+  </div>
+
+  <h3>Recording a New Expense</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><div class="step-content"><strong>Click "Add Expense"</strong> — the blue button in the top right.</div></li>
+    <li><div class="step-num">2</div><div class="step-content"><strong>The form opens.</strong> Fill in all required fields (marked with a red asterisk *).</div></li>
+    <li><div class="step-num">3</div><div class="step-content"><strong>Click "Create Expense".</strong> The entry is saved and a unique Document Number is automatically assigned (e.g. DOC-202604-0001).</div></li>
+  </ol>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Add Expense Form</div>
+    <div class="screenshot-desc">Shows the expense form with two rows of dropdowns and date pickers at top, a full-width description field, and amount/odometer fields at the bottom</div>
+  </div>
+
+  <h4>Complete Field Guide</h4>
+  <table class="field-table">
+    <tr><th>Field</th><th>What to enter</th><th></th></tr>
+    <tr><td><strong>Vehicle</strong></td><td>Select the truck this expense belongs to. Only active trucks appear in this list.</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Supplier</strong></td><td>Select the supplier. For example, choose "Said Salim Bakhresa" for a fuel purchase from them. Leave blank if there is no specific supplier.</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Date</strong></td><td>The date the expense occurred. Defaults to today.</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Due Date</strong></td><td>The date this invoice must be paid by. Used for credit terms (e.g. 30 days after purchase).</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Reference No</strong></td><td>The supplier's invoice number or your own reference. This is the number on the paper invoice you receive, e.g. "INV-2026-0045".</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Type</strong></td><td>Category of expense: Fuel, Maintenance, Insurance, Parts, or Other.</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Payment Status</strong></td><td>
+      • <span class="label label-red">Unpaid</span> — invoice received, not yet paid<br/>
+      • <span class="label label-amber">Partial</span> — some payment made, balance remaining<br/>
+      • <span class="label label-green">Paid</span> — fully settled
+    </td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Item Description</strong></td><td>A clear description of what this expense is for. Example: "Diesel 200L — Dar es Salaam to Mombasa trip". Be specific so you can find it later.</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Quantity</strong></td><td>How many units were purchased. For fuel, this is the number of litres. For parts, it could be the number of items.</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Unit</strong></td><td>The unit of measure. Examples: "Litres", "KG", "Pcs" (pieces).</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Debit (TZS)</strong></td><td>The amount you OWE or SPENT. Enter the total cost of this purchase in Tanzanian Shillings. Do not add commas — just type the number (e.g. 450000).</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Credit (TZS)</strong></td><td>The amount you RECEIVED or PAID BACK. If JIFS made a payment to a supplier, enter it here. This reduces the outstanding balance.</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Odometer (KM)</strong></td><td>The truck's current odometer reading in kilometres at the time of this transaction. Used for calculating cost-per-kilometre in fuel reports.</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Notes</strong></td><td>Any extra information, special instructions, or comments about this entry.</td><td><span class="optional">Optional</span></td></tr>
+  </table>
+
+  <h3>Understanding Debit vs Credit</h3>
+  <div class="two-col">
+    <div class="callout danger" style="margin:0;">
+      <span class="callout-icon" style="font-size:28px;">📤</span>
+      <div class="callout-content">
+        <strong>Debit = Money going OUT</strong>
+        <p>You bought something. You owe the supplier money. Record the cost in the Debit field.<br/><em>Example: Bought 300L diesel for TZS 450,000 → Debit: 450,000</em></p>
+      </div>
+    </div>
+    <div class="callout success" style="margin:0;">
+      <span class="callout-icon" style="font-size:28px;">📥</span>
+      <div class="callout-content">
+        <strong>Credit = Money going IN or paid</strong>
+        <p>JIFS paid a supplier or received a refund. Record it in the Credit field. This reduces what you owe.<br/><em>Example: Paid supplier TZS 200,000 → Credit: 200,000</em></p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Document Number (Auto-Generated)</h3>
+  <p>Every new expense is automatically given a unique Document Number like <strong>DOC-202604-0001</strong>. This number is assigned by the system — you do not need to type it. When editing an expense, the Document Number is shown in grey (read-only) so it cannot be accidentally changed.</p>
+
+  <h3>Copying an Existing Expense (Duplicate)</h3>
+  <p>When you need to record the same type of expense for multiple trucks (e.g. fuel for 8 trucks on the same day), use the <strong>Copy</strong> button instead of filling the form from scratch each time:</p>
+  <ol class="steps">
+    <li><div class="step-num">1</div><div class="step-content">Find the expense row you want to copy and click the grey <strong>Copy</strong> button.</div></li>
+    <li><div class="step-num">2</div><div class="step-content">The form opens pre-filled with the same vehicle, supplier, type, description, and amount — but with today's date and a blank credit/odometer field.</div></li>
+    <li><div class="step-num">3</div><div class="step-content">Change only what is different (e.g. different truck, different amount) and click <strong>Create Expense</strong>.</div></li>
+  </ol>
+
+  <div class="callout tip"><span class="callout-icon"></span><div class="callout-content"><strong>Save time with Copy</strong><p>If 10 trucks all refuelled at the same station on the same day, record the first one, then use Copy 9 more times and just change the truck plate and amount each time.</p></div></div>
+
+  <h3>Editing an Expense</h3>
+  <p>Click <strong>Edit</strong> next to any expense to make corrections. Change the fields you need and click <strong>Update Expense</strong>. The Document Number remains the same.</p>
+
+  <h3>Deleting an Expense (Admin Only)</h3>
+  <p>Only admin users can delete expenses. Click <strong>Del</strong> next to the entry and confirm. Deleted expenses cannot be recovered, so be careful.</p>
+
+  <h3>Searching and Filtering Expenses</h3>
+  <p>Use the filter bar at the top to find specific entries:</p>
+  <ul style="margin: 10px 0 16px 20px; line-height: 2.2;">
+    <li><strong>Search box</strong> — Type any word to search across vehicle plate, supplier name, reference number, description, or document number.</li>
+    <li><strong>Type filter</strong> — Show only Fuel, Maintenance, Insurance, Parts, or Other expenses.</li>
+    <li><strong>Payment Status filter</strong> — Show only Unpaid, Partial, or Paid entries.</li>
+    <li><strong>Date range</strong> — Enter a From and To date to see expenses within a specific period.</li>
+  </ul>
+  <p>Click <strong>Clear filters</strong> to go back to the full list.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Expense Filters Bar</div>
+    <div class="screenshot-desc">Shows the filter row with search input, type dropdown, payment status dropdown, and two date pickers side by side</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 6 — PRINT STATEMENT
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch6">
+  <div class="chapter-header">
+    <div class="chapter-icon">🖨️</div>
+    <div>
+      <div class="chapter-num">CHAPTER 6</div>
+      <h2>Print Statement — Supplier Reconciliation</h2>
+      <p>Generate a ledger statement to compare with what your supplier sends you</p>
+    </div>
+  </div>
+
+  <p>Every month, suppliers like Said Salim Bakhresa send JIFS a statement showing all transactions and the outstanding balance. The Print Statement feature generates JIFS's own version of this document so you can compare them side by side and confirm the numbers match. This is called <strong>reconciliation</strong>.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Print Statement Page — Filter Panel</div>
+    <div class="screenshot-desc">Shows the filter card with From Date, To Date, and the supplier selection buttons (All Suppliers or individual supplier buttons in blue when selected)</div>
+  </div>
+
+  <h3>Generating a Statement</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><div class="step-content"><strong>The statement for the current month loads automatically</strong> when you open this page. You will see the data immediately.</div></li>
+    <li><div class="step-num">2</div><div class="step-content"><strong>To change the period:</strong> Update the From Date and To Date fields at the top.</div></li>
+    <li><div class="step-num">3</div><div class="step-content"><strong>To filter by supplier:</strong> Click one or more supplier buttons. The button turns blue when selected. Click "All Suppliers" to see everyone combined.</div></li>
+    <li><div class="step-num">4</div><div class="step-content"><strong>Click "Generate Statement"</strong> to reload with your new filters.</div></li>
+  </ol>
+
+  <h3>Reading the Statement Table</h3>
+  <p>The statement table matches the same column format that suppliers use in their own statements, making comparison easy:</p>
+
+  <table class="field-table">
+    <tr><th>Column</th><th>Meaning</th></tr>
+    <tr><td><strong>Date</strong></td><td>The date of the transaction.</td></tr>
+    <tr><td><strong>Due Date</strong></td><td>The payment due date for this invoice.</td></tr>
+    <tr><td><strong>Document No</strong></td><td>JIFS's internal document reference (auto-generated, e.g. DOC-202604-0001).</td></tr>
+    <tr><td><strong>Reference</strong></td><td>The supplier's invoice number entered when recording the expense.</td></tr>
+    <tr><td><strong>Item Description</strong></td><td>What the expense was for.</td></tr>
+    <tr><td><strong>Truck No</strong></td><td>The plate number of the vehicle.</td></tr>
+    <tr><td><strong>QTY</strong></td><td>Quantity (e.g. litres of fuel).</td></tr>
+    <tr><td><strong>UOM</strong></td><td>Unit of measure (e.g. Litres).</td></tr>
+    <tr><td><strong>Debit</strong></td><td>Money owed to the supplier (shown in red).</td></tr>
+    <tr><td><strong>Credit</strong></td><td>Payments made to the supplier (shown in green).</td></tr>
+    <tr><td><strong>Balance</strong></td><td>Running total — the cumulative amount owed after each row. If this turns red, it means JIFS owes money.</td></tr>
+  </table>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Statement Table with Running Balance</div>
+    <div class="screenshot-desc">Shows the ledger table with all columns, running balance column in dark/red, and the totals footer row at the bottom</div>
+  </div>
+
+  <h3>Summary Cards</h3>
+  <p>Below the table are three summary boxes: <strong>Total Debit</strong> (everything owed), <strong>Total Credit</strong> (everything paid), and <strong>Closing Balance</strong> (what is still owed). These match the totals row at the bottom of the supplier's statement.</p>
+
+  <h3>Printing the Statement</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><div class="step-content">Once the statement is generated, click the blue <strong>Print</strong> button in the top-right corner.</div></li>
+    <li><div class="step-num">2</div><div class="step-content">Your browser's print dialog opens. Select your printer and click Print.</div></li>
+    <li><div class="step-num">3</div><div class="step-content">The printout will hide the menu and filter panel — only the clean statement with the JIFS logo header is printed.</div></li>
+  </ol>
+
+  <div class="callout tip"><span class="callout-icon"></span><div class="callout-content"><strong>Save as PDF instead of printing</strong><p>In the print dialog, change the printer destination to "Save as PDF". This creates a digital copy you can send by email or WhatsApp.</p></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 7 — SERVICES
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch7">
+  <div class="chapter-header">
+    <div class="chapter-icon">🔧</div>
+    <div>
+      <div class="chapter-num">CHAPTER 7</div>
+      <h2>Services — Maintenance Tracking</h2>
+      <p>Schedule and track all maintenance and service history for each truck</p>
+    </div>
+  </div>
+
+  <p>The Services page keeps a record of every maintenance event — oil changes, tyre rotations, engine checks — and allows you to set the date when the next service is due. The Dashboard will automatically alert you when a service is approaching.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Services List</div>
+    <div class="screenshot-desc">Shows the services table with columns: Vehicle, Service Date, Description, Next Service Date (with amber/red badge if soon), and Edit/Delete actions</div>
+  </div>
+
+  <h3>Recording a Service</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><div class="step-content">Click <strong>Add Service</strong> in the top-right corner.</div></li>
+    <li><div class="step-num">2</div><div class="step-content">Fill in the form with the service details.</div></li>
+    <li><div class="step-num">3</div><div class="step-content">Click <strong>Create Service</strong> to save.</div></li>
+  </ol>
+
+  <h4>Field Guide</h4>
+  <table class="field-table">
+    <tr><th>Field</th><th>What to enter</th><th></th></tr>
+    <tr><td><strong>Vehicle</strong></td><td>Select the truck that was serviced.</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Service Date</strong></td><td>The date the service was performed.</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Description</strong></td><td>What was done, e.g. "Oil change + filter", "Full 50,000 KM service", "Brake pad replacement".</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Next Service Date</strong></td><td>When this truck should be serviced again. The Dashboard will show an alert 30 days before this date.</td><td><span class="optional">Optional but recommended</span></td></tr>
+    <tr><td><strong>Next Service KM</strong></td><td>The odometer reading at which the next service should happen (e.g. 50,000 KM).</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Linked Expense</strong></td><td>If you already recorded the cost of this service in the Expenses page, you can link it here for reference.</td><td><span class="optional">Optional</span></td></tr>
+  </table>
+
+  <div class="callout warning"><span class="callout-icon"></span><div class="callout-content"><strong>Always set the Next Service Date</strong><p>Without a Next Service Date, the system cannot remind you when maintenance is due. After every service, set the next date so no truck is forgotten.</p></div></div>
+
+  <h3>Service Alerts on the Dashboard</h3>
+  <p>Once a Next Service Date is set, the Dashboard will show that truck in the "Upcoming Services" panel when the date is within 30 days. The Reports → Services tab shows both overdue services and all upcoming ones within 60 days.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 8 — PARTS
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch8">
+  <div class="chapter-header">
+    <div class="chapter-icon">⚙️</div>
+    <div>
+      <div class="chapter-num">CHAPTER 8</div>
+      <h2>Parts — Spare Parts with Expiry</h2>
+      <p>Track installed parts and get alerts before they expire or need replacement</p>
+    </div>
+  </div>
+
+  <p>The Parts page tracks components installed on each truck — such as tyres, batteries, timing belts — along with their expiry or replacement dates. When a part is approaching its expiry, the Dashboard shows an alert.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Parts List</div>
+    <div class="screenshot-desc">Shows the parts table with columns: Vehicle, Part Name, Part Number, Installed Date, Expiry Date, and a coloured days-remaining badge</div>
+  </div>
+
+  <h3>Adding a Part</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><div class="step-content">Click <strong>Add Part</strong> in the top-right corner.</div></li>
+    <li><div class="step-num">2</div><div class="step-content">Fill in the part details.</div></li>
+    <li><div class="step-num">3</div><div class="step-content">Click <strong>Create Part</strong>.</div></li>
+  </ol>
+
+  <h4>Field Guide</h4>
+  <table class="field-table">
+    <tr><th>Field</th><th>What to enter</th><th></th></tr>
+    <tr><td><strong>Vehicle</strong></td><td>The truck this part is installed on.</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Part Name</strong></td><td>The name of the part, e.g. "Front Tyre", "Battery", "Timing Belt", "Air Filter".</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Part Number</strong></td><td>The manufacturer's part number or serial number from the box/receipt, if available.</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Installed Date</strong></td><td>When this part was fitted on the truck.</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Expiry Date</strong></td><td>When this part needs to be replaced. The Dashboard will alert you 30 days before this date.</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Linked Service</strong></td><td>If this part was fitted during a recorded service, you can link them together.</td><td><span class="optional">Optional</span></td></tr>
+  </table>
+
+  <div class="callout tip"><span class="callout-icon"></span><div class="callout-content"><strong>Use Parts for vehicle documents too — or use the Documents page</strong><p>You can use Parts to track items with an expiry date. However, for official documents like TRA stickers, road licences, and insurance, it is better to use the dedicated <strong>Documents</strong> page (Chapter 9) which has specific document types and shows them separately on the Dashboard.</p></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 9 — DOCUMENTS
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch9">
+  <div class="chapter-header">
+    <div class="chapter-icon">📄</div>
+    <div>
+      <div class="chapter-num">CHAPTER 9</div>
+      <h2>Documents — Vehicle Documents &amp; Licences</h2>
+      <p>Track TRA stickers, road licences, insurance, and all official vehicle documents</p>
+    </div>
+  </div>
+
+  <p>Every truck in Tanzania must carry valid official documents. Missing or expired documents can lead to fines, impounding, or being stopped at roadblocks. The Documents page tracks all of these with expiry date alerts so nothing slips through.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Documents List</div>
+    <div class="screenshot-desc">Shows the documents table with columns: Truck, Document Type, Name/Number, Issue Date, Expiry Date, Status badge (green/amber/red), and Edit/Delete actions. Red alert banner appears at top if any are expired.</div>
+  </div>
+
+  <h3>Alert Banners</h3>
+  <p>If any documents are expired or expiring within 14 days, red and amber warning banners appear at the top of the Documents page. The Dashboard also shows these alerts in a dedicated "Vehicle Documents" panel.</p>
+
+  <h3>Adding a Document</h3>
+  <ol class="steps">
+    <li><div class="step-num">1</div><div class="step-content">Click <strong>Add Document</strong> in the top-right corner.</div></li>
+    <li><div class="step-num">2</div><div class="step-content">Fill in the document details.</div></li>
+    <li><div class="step-num">3</div><div class="step-content">Click <strong>Save Document</strong>.</div></li>
+  </ol>
+
+  <h4>Document Types Available</h4>
+  <table class="field-table">
+    <tr><th>Document Type</th><th>Description</th></tr>
+    <tr><td><span class="label label-blue">TRA Sticker</span></td><td>Tanzania Revenue Authority vehicle inspection sticker — renewed annually.</td></tr>
+    <tr><td><span class="label label-blue">Road Licence</span></td><td>Road licence issued by SUMATRA — required for all commercial vehicles.</td></tr>
+    <tr><td><span class="label label-blue">PSV Licence</span></td><td>Public Service Vehicle licence for passenger-carrying vehicles.</td></tr>
+    <tr><td><span class="label label-blue">Insurance</span></td><td>Comprehensive or third-party insurance certificate.</td></tr>
+    <tr><td><span class="label label-blue">Goods Licence</span></td><td>Licence for carrying goods/freight.</td></tr>
+    <tr><td><span class="label label-blue">Other</span></td><td>Any other official document with an expiry date.</td></tr>
+  </table>
+
+  <h4>Field Guide</h4>
+  <table class="field-table">
+    <tr><th>Field</th><th>What to enter</th><th></th></tr>
+    <tr><td><strong>Truck</strong></td><td>The vehicle this document belongs to.</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Document Type</strong></td><td>Select from the list above.</td><td><span class="required">Required</span></td></tr>
+    <tr><td><strong>Document Name</strong></td><td>A descriptive name, e.g. "Jubilee Insurance — Comprehensive", "TRA 2026 Sticker".</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Document Number</strong></td><td>The official reference number printed on the document, e.g. "INS-TZ-2026-00912".</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Issue Date</strong></td><td>When the document was issued or last renewed.</td><td><span class="optional">Optional</span></td></tr>
+    <tr><td><strong>Expiry Date</strong></td><td>When the document expires. The system will alert you 60 days before this date.</td><td><span class="optional">Recommended</span></td></tr>
+    <tr><td><strong>Notes</strong></td><td>Any extra information, e.g. the issuing office or renewal instructions.</td><td><span class="optional">Optional</span></td></tr>
+  </table>
+
+  <h3>Status Badges</h3>
+  <p>Each document row shows a coloured badge based on its expiry date:</p>
+  <ul style="margin: 10px 0 16px 20px; line-height: 2.5;">
+    <li><span class="label label-green">45 days left</span> — Valid. No immediate action needed.</li>
+    <li><span class="label label-amber">25 days left</span> — Expiring within 60 days. Plan renewal soon.</li>
+    <li><span class="label label-red">3 days left</span> — Critical. Renew immediately.</li>
+    <li><span class="label label-red">Expired 5d ago</span> — Document has already expired. Urgent action required.</li>
+  </ul>
+
+  <h3>Filtering the List</h3>
+  <p>Use the three filters at the top to narrow down what you see: search by truck plate or document number, filter by document type, or filter by status (Expired, Expiring Soon, or Valid).</p>
+
+  <div class="callout warning"><span class="callout-icon"></span><div class="callout-content"><strong>Update expiry dates when you renew</strong><p>When a document is renewed, don't add a new record — edit the existing one and update the Issue Date and Expiry Date to the new dates. This keeps one record per document per truck.</p></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 10 — REPORTS
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch10">
+  <div class="chapter-header">
+    <div class="chapter-icon">📈</div>
+    <div>
+      <div class="chapter-num">CHAPTER 10</div>
+      <h2>Reports — Financial Analysis</h2>
+      <p>Analyse fleet costs, fuel consumption, supplier balances, and more</p>
+    </div>
+  </div>
+
+  <p>The Reports page provides 8 different views of your data. Click any tab across the top to switch between report types. Reports with a date filter will show a From/To date bar; others load automatically.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Reports Page — Tab Navigation</div>
+    <div class="screenshot-desc">Shows the 8 tab buttons across the top (By Vehicle, By Category, Transactions, Fuel, Supplier Balances, Services, Parts Expiry, Monthly Overview), with the active tab highlighted in blue</div>
+  </div>
+
+  <hr/>
+
+  <h3>Tab 1 — By Vehicle</h3>
+  <p>Shows total spending per truck within a selected date range. Useful for comparing which trucks are costing the most.</p>
+  <ul style="margin: 8px 0 16px 20px; line-height: 2;">
+    <li><strong>Transactions</strong> — how many expense records exist for that truck</li>
+    <li><strong>Total Debit</strong> — total money spent on that truck</li>
+    <li><strong>Total Credit</strong> — total payments received/made for that truck</li>
+    <li><strong>Net Cost</strong> — Debit minus Credit (the actual net expenditure)</li>
+  </ul>
+
+  <h3>Tab 2 — By Category</h3>
+  <p>Shows how much has been spent in each expense category (Fuel, Maintenance, Insurance, Parts, Other) within a selected period. Helps you understand where the money is going.</p>
+
+  <h3>Tab 3 — Transactions</h3>
+  <p>A full list of every transaction within a date range, with all details visible: date, truck, supplier, description, reference number, debit, and credit. The footer shows total debits and total credits for the period.</p>
+
+  <h3>Tab 4 — Fuel</h3>
+  <p>Fuel-specific report showing per-truck statistics for the selected period:</p>
+  <ul style="margin: 8px 0 16px 20px; line-height: 2;">
+    <li><strong>Fill-ups</strong> — how many times fuel was purchased for this truck</li>
+    <li><strong>Total Litres</strong> — total fuel volume in litres</li>
+    <li><strong>Total Cost</strong> — total amount spent on fuel</li>
+    <li><strong>Cost per Litre</strong> — automatically calculated average price</li>
+  </ul>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Fuel Report Tab</div>
+    <div class="screenshot-desc">Shows the fuel table with per-truck fill-ups, litres, cost, and cost-per-litre columns, with totals row at the bottom</div>
+  </div>
+
+  <h3>Tab 5 — Supplier Balances</h3>
+  <p>Shows how much JIFS currently owes to each supplier across all time (not limited to a date range). The "Outstanding Balance" column shows the total Debit minus total Credit — if it is greater than zero (shown in amber), JIFS still owes that supplier money.</p>
+
+  <div class="callout tip"><span class="callout-icon"></span><div class="callout-content"><strong>Compare with supplier statements</strong><p>Use the Supplier Balances report together with the Print Statement page. Supplier Balances gives you a quick overview of all suppliers; Print Statement gives you the full line-by-line detail for one supplier at a time.</p></div></div>
+
+  <h3>Tab 6 — Services (Maintenance Schedule)</h3>
+  <p>Shows two sections:</p>
+  <ul style="margin: 8px 0 16px 20px; line-height: 2;">
+    <li><span style="color:var(--red);">●</span> <strong>Overdue Services</strong> — trucks whose service date has already passed. The column shows how many days ago it was due.</li>
+    <li><span style="color:var(--amber);">●</span> <strong>Upcoming (next 60 days)</strong> — trucks with service due soon. Days are colour-coded: green (safe), amber (within 14 days), red (within 7 days).</li>
+  </ul>
+
+  <h3>Tab 7 — Parts Expiry</h3>
+  <p>Similar two-section layout for parts:</p>
+  <ul style="margin: 8px 0 16px 20px; line-height: 2;">
+    <li><span style="color:var(--red);">●</span> <strong>Expired Parts</strong> — parts that have already passed their expiry date</li>
+    <li><span style="color:var(--amber);">●</span> <strong>Expiring (next 90 days)</strong> — parts expiring soon, colour-coded by urgency</li>
+  </ul>
+
+  <h3>Tab 8 — Monthly Overview</h3>
+  <p>A full breakdown for a single month. Use the Month picker to choose which month to view.</p>
+
+  <div class="screenshot">
+    <div class="screenshot-label">Screenshot: Monthly Overview</div>
+    <div class="screenshot-desc">Shows 4 summary cards at top (Transactions, Total Debit, Total Credit, vs Last Month % change), then two side-by-side tables: Breakdown by Category and Breakdown by Truck</div>
+  </div>
+
+  <p>The four summary cards include a comparison against the previous month — a green percentage means spending went down, red means it went up.</p>
+
+  <h3>Printing Reports</h3>
+  <p>Once a report is loaded, click the blue <strong>Print</strong> button in the top-right corner. The sidebar and filter panel are hidden in the printout, leaving a clean table. You can also save it as a PDF from the print dialog.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 11 — DAILY WORKFLOW
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch11">
+  <div class="chapter-header">
+    <div class="chapter-icon">📅</div>
+    <div>
+      <div class="chapter-num">CHAPTER 11</div>
+      <h2>Daily Workflow — How to Use the System</h2>
+      <p>Step-by-step guide for a typical working day</p>
+    </div>
+  </div>
+
+  <h3>Morning Routine (5 minutes)</h3>
+  <div class="workflow">
+    <h4>1. Check the Dashboard</h4>
+    <ol class="steps" style="margin-bottom:0;">
+      <li><div class="step-num">1</div><div class="step-content">Open the system and log in. The Dashboard loads automatically.</div></li>
+      <li><div class="step-num">2</div><div class="step-content">Check the <strong>Budget Warnings</strong> card — any truck spending too much will appear here.</div></li>
+      <li><div class="step-num">3</div><div class="step-content">Check <strong>Upcoming Services</strong> — take note of any trucks due for service this week.</div></li>
+      <li><div class="step-num">4</div><div class="step-content">Check <strong>Vehicle Documents</strong> — any expired or near-expiry documents will be highlighted in red. Arrange renewals immediately.</div></li>
+    </ol>
+  </div>
+
+  <h3>Recording Daily Expenses</h3>
+  <div class="workflow">
+    <h4>2. Log Fuel Purchases</h4>
+    <ol class="steps" style="margin-bottom:0;">
+      <li><div class="step-num">1</div><div class="step-content">Collect all fuel receipts or delivery notes from drivers.</div></li>
+      <li><div class="step-num">2</div><div class="step-content">Go to <strong>Expenses</strong> and click <strong>Add Expense</strong>.</div></li>
+      <li><div class="step-num">3</div><div class="step-content">Select the truck, choose type "Fuel", enter the supplier, description, litres (Quantity), and the cost (Debit). Enter the odometer reading if available.</div></li>
+      <li><div class="step-num">4</div><div class="step-content">For multiple trucks at the same station: record the first truck, then use <strong>Copy</strong> for each remaining truck and adjust the plate and amount.</div></li>
+    </ol>
+  </div>
+
+  <div class="workflow">
+    <h4>3. Record Other Expenses</h4>
+    <p style="margin-bottom:8px;">For maintenance, insurance premiums, parts purchases, or any other costs, follow the same process as fuel — just change the Type and Description accordingly.</p>
+  </div>
+
+  <div class="workflow">
+    <h4>4. Record Payments to Suppliers (Credits)</h4>
+    <p style="margin-bottom:8px;">When JIFS makes a payment to a supplier, record it as a new expense entry but put the payment amount in the <strong>Credit</strong> field (not Debit). Select the same supplier. This reduces the outstanding balance on the supplier statement.</p>
+    <p style="margin-bottom:0;">Also update the <strong>Payment Status</strong> of relevant invoices to <span class="label label-green">Paid</span> or <span class="label label-amber">Partial</span>.</p>
+  </div>
+
+  <h3>End of Month Routine</h3>
+  <div class="workflow">
+    <h4>5. Reconcile with Supplier Statements</h4>
+    <ol class="steps" style="margin-bottom:0;">
+      <li><div class="step-num">1</div><div class="step-content">When the supplier sends their monthly statement, go to <strong>Print Statement</strong>.</div></li>
+      <li><div class="step-num">2</div><div class="step-content">Set the date range to match the supplier's statement period.</div></li>
+      <li><div class="step-num">3</div><div class="step-content">Select the specific supplier using the toggle buttons.</div></li>
+      <li><div class="step-num">4</div><div class="step-content">Click <strong>Generate Statement</strong> and compare each line with the supplier's document. The totals should match.</div></li>
+      <li><div class="step-num">5</div><div class="step-content">Print or save as PDF for your records.</div></li>
+    </ol>
+  </div>
+
+  <div class="workflow">
+    <h4>6. Review Monthly Spending</h4>
+    <ol class="steps" style="margin-bottom:0;">
+      <li><div class="step-num">1</div><div class="step-content">Go to <strong>Reports → Monthly Overview</strong>.</div></li>
+      <li><div class="step-num">2</div><div class="step-content">Select the month you want to review.</div></li>
+      <li><div class="step-num">3</div><div class="step-content">Check the comparison vs previous month. If spending increased significantly, look at the "Breakdown by Category" table to see what changed.</div></li>
+      <li><div class="step-num">4</div><div class="step-content">Look at "Breakdown by Truck" to identify any trucks that are costing unusually more than others.</div></li>
+    </ol>
+  </div>
+
+  <h3>First-Time Setup (One-Time Process)</h3>
+  <div class="workflow">
+    <h4>Complete setup in this order:</h4>
+    <ol class="steps" style="margin-bottom:0;">
+      <li><div class="step-num">1</div><div class="step-content"><strong>Add all vehicles</strong> — Go to Vehicles and add every truck with its plate number. Set a monthly budget for each if desired.</div></li>
+      <li><div class="step-num">2</div><div class="step-content"><strong>Add all suppliers</strong> — Go to Suppliers and add every company you buy from.</div></li>
+      <li><div class="step-num">3</div><div class="step-content"><strong>Add vehicle documents</strong> — Go to Documents and add the TRA sticker, road licence, and insurance for every truck with their expiry dates.</div></li>
+      <li><div class="step-num">4</div><div class="step-content"><strong>Start recording expenses</strong> — You are ready to begin the daily routine above.</div></li>
+    </ol>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHAPTER 12 — TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════ -->
+<div class="page chapter" id="ch12">
+  <div class="chapter-header">
+    <div class="chapter-icon">🛠️</div>
+    <div>
+      <div class="chapter-num">CHAPTER 12</div>
+      <h2>Common Questions &amp; Troubleshooting</h2>
+      <p>Answers to the most common issues users encounter</p>
+    </div>
+  </div>
+
+  <h3>The system is not opening in the browser</h3>
+  <div class="callout warning"><span class="callout-icon"></span><div class="callout-content"><strong>The system must be started first</strong><p>The JIFS Fleet system needs to be running on the computer before you can open it in the browser. Ask your IT contact or the person who set it up to run the startup script (<em>start-jifs.sh</em>) on the office computer. Once started, open the browser and go to <kbd>http://localhost:5173</kbd>.</p></div></div>
+
+  <h3>I cannot find my vehicle in the Expenses form</h3>
+  <p>Only <span class="label label-green">Active</span> vehicles appear in the vehicle selection dropdown. If a truck is not showing up, check that it is registered in the Vehicles page and that its status is set to Active.</p>
+
+  <h3>I made a mistake in an expense entry</h3>
+  <p>Go to the Expenses page, find the entry, and click <strong>Edit</strong>. Correct the fields and click <strong>Update Expense</strong>. If you need to remove the entry entirely, an Admin can click <strong>Del</strong> to delete it.</p>
+
+  <h3>The statement balance does not match the supplier's statement</h3>
+  <p>If the closing balance is different from what the supplier shows:</p>
+  <ul style="margin: 10px 0 16px 20px; line-height: 2;">
+    <li>Check that all invoices from the supplier have been entered in Expenses.</li>
+    <li>Check that all payments made to the supplier are recorded as <strong>Credit</strong> entries.</li>
+    <li>Make sure the date range exactly matches the supplier's statement period.</li>
+    <li>Look for any entry where the Debit and Credit amounts may have been swapped.</li>
+  </ul>
+
+  <h3>I cannot delete a vehicle</h3>
+  <p>If you see a message saying the vehicle cannot be deleted, it means there are expenses linked to it. Instead of deleting, edit the vehicle and change its Status to <span class="label label-red">Inactive</span>. This hides it from the expense form but keeps all historical data.</p>
+
+  <h3>The budget warning is showing incorrectly</h3>
+  <p>The budget warning compares spending for the <em>current calendar month only</em> against the monthly budget set on the vehicle. If the budget figure is wrong, go to Vehicles, click Edit on that truck, and update the Monthly Budget amount.</p>
+
+  <h3>I forgot my password</h3>
+  <p>Ask your system Admin to reset your account. The Admin can create a new user for you. There is no automatic password reset — only an Admin can manage user accounts.</p>
+
+  <h3>Data backup</h3>
+  <div class="callout danger"><span class="callout-icon"></span><div class="callout-content"><strong>Back up the database regularly</strong><p>All data is stored in a single file at: <kbd>backend/data/fleet.db</kbd> on the office computer. Copy this file to a USB drive or external hard disk at least once per week. If the computer is lost or damaged, this file is the only way to recover your data.</p></div></div>
+
+  <h3>Getting Help</h3>
+  <p>For technical support, contact your system developer:</p>
+  <div style="background: var(--gray-light); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-top: 16px;">
+    <p style="margin-bottom: 8px;"><strong>Developer:</strong> Seynation Digital LTD</p>
+    <p style="margin-bottom: 0; color: var(--text-muted); font-size: 14px;">Describe the problem clearly — what you were trying to do, what you clicked, and what message appeared on the screen.</p>
+  </div>
+
+  <hr/>
+
+  <div style="text-align: center; padding: 40px 0; color: var(--text-muted);">
+    <div style="font-size: 40px; margin-bottom: 16px;">🚛</div>
+    <p style="font-size: 18px; font-weight: 700; color: var(--text);">JIFS Fleet Management System</p>
+    <p>User Guide v1.0 · April 2026</p>
+    <p style="margin-top: 8px; font-size: 13px;">Prepared by Seynation Digital LTD for JIFS Company, Tanzania</p>
+  </div>
+</div>
+
+</body>
+</html>

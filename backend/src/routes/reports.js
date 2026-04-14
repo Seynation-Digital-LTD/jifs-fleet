@@ -37,6 +37,40 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
             ORDER BY p.expiry_date ASC
         `).all();
 
+        // Expiring vehicle documents (next 60 days)
+        const expiringDocuments = db.prepare(`
+            SELECT d.doc_type, d.doc_name, d.doc_number, d.expiry_date, v.plate_no
+            FROM vehicle_documents d
+            JOIN vehicles v ON d.vehicle_id = v.id
+            WHERE d.expiry_date IS NOT NULL
+            AND d.expiry_date <= date('now', '+60 days')
+            AND d.expiry_date >= date('now')
+            ORDER BY d.expiry_date ASC
+        `).all();
+
+        // Overdue vehicle documents
+        const overdueDocuments = db.prepare(`
+            SELECT d.doc_type, d.doc_name, d.doc_number, d.expiry_date, v.plate_no
+            FROM vehicle_documents d
+            JOIN vehicles v ON d.vehicle_id = v.id
+            WHERE d.expiry_date IS NOT NULL
+            AND d.expiry_date < date('now')
+            ORDER BY d.expiry_date ASC
+        `).all();
+
+        // Budget warnings — trucks spending > 80% of monthly budget this month
+        const budgetWarnings = db.prepare(`
+            SELECT v.plate_no, v.monthly_budget,
+                   COALESCE(SUM(e.debit), 0) as month_spent
+            FROM vehicles v
+            LEFT JOIN expenses e ON v.id = e.vehicle_id
+                AND e.date >= date('now', 'start of month')
+            WHERE v.monthly_budget > 0
+            GROUP BY v.id
+            HAVING month_spent >= v.monthly_budget * 0.8
+            ORDER BY (month_spent / v.monthly_budget) DESC
+        `).all();
+
         res.json({
             activeVehicles: totalVehicles.count,
             totalSuppliers: totalSuppliers.count,
@@ -44,7 +78,10 @@ router.get('/dashboard', isAuthenticated, (req, res) => {
             totalCredit: totalCredits.total || 0,
             monthExpenses: monthExpenses.total || 0,
             upcomingServices,
-            expiringParts
+            expiringParts,
+            expiringDocuments,
+            overdueDocuments,
+            budgetWarnings
         });
     } catch (error) {
         console.error('Dashboard error:', error);
