@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../config/db');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { auditLog } = require('../middleware/security');
 
 const router = express.Router();
 
@@ -9,6 +10,13 @@ const generateDocumentNo = (id) => {
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     return `DOC-${year}${month}-${String(id).padStart(4, '0')}`;
+};
+
+const generateRefNo = (id) => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    return `REF-${year}${month}-${String(id).padStart(4, '0')}`;
 };
 
 // GET all expenses
@@ -141,7 +149,9 @@ router.post('/', isAuthenticated, (req, res) => {
 
         const newId = result.lastInsertRowid;
         const document_no = generateDocumentNo(newId);
-        db.prepare('UPDATE expenses SET document_no = ? WHERE id = ?').run(document_no, newId);
+        const auto_ref = reference_no ? null : generateRefNo(newId);
+        db.prepare('UPDATE expenses SET document_no = ?, reference_no = COALESCE(reference_no, ?) WHERE id = ?')
+            .run(document_no, auto_ref, newId);
 
         res.status(201).json({ message: 'Expense created', expenseId: newId, document_no });
     } catch (error) {
@@ -198,9 +208,10 @@ router.put('/:id', isAuthenticated, (req, res) => {
 router.delete('/:id', isAdmin, (req, res) => {
     try {
         const { id } = req.params;
-        const existing = db.prepare('SELECT id FROM expenses WHERE id = ?').get(id);
+        const existing = db.prepare('SELECT reference_no, date FROM expenses WHERE id = ?').get(id);
         if (!existing) return res.status(404).json({ error: 'Expense not found' });
         db.prepare('DELETE FROM expenses WHERE id = ?').run(id);
+        auditLog('DELETE_EXPENSE', `Deleted expense id=${id} ref=${existing.reference_no} date=${existing.date}`, req.session.user?.id, req);
         res.json({ message: 'Expense deleted' });
     } catch (error) {
         console.error('Delete expense error:', error);

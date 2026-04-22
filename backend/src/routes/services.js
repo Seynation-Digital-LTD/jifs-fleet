@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../config/db');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { auditLog } = require('../middleware/security');
 
 const router = express.Router();
 
@@ -141,7 +142,9 @@ router.delete('/:id', isAdmin, (req, res) => {
             return res.status(404).json({ error: 'Service not found' });
         }
         
+        const svc = db.prepare('SELECT vehicle_id, service_date FROM services WHERE id = ?').get(id);
         db.prepare('DELETE FROM services WHERE id = ?').run(id);
+        auditLog('DELETE_SERVICE', `Deleted service id=${id} vehicle_id=${svc?.vehicle_id} date=${svc?.service_date}`, req.session.user?.id, req);
         res.json({ message: 'Service deleted' });
     } catch (error) {
         console.error('Delete service error:', error);

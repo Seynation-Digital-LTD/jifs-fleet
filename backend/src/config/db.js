@@ -42,6 +42,56 @@ const initDb = () => {
             catch (err) { console.error(`Migration error vehicles.${m.name}:`, err.message); }
         }
     }
+
+    // Migrate suppliers table
+    const supplierColumns = db.pragma('table_info(suppliers)').map(col => col.name);
+    const supplierMigrations = [
+        { name: 'type_label', sql: 'ALTER TABLE suppliers ADD COLUMN type_label TEXT' },
+    ];
+    for (const m of supplierMigrations) {
+        if (!supplierColumns.includes(m.name)) {
+            try { db.exec(m.sql); console.log(`Migration: added suppliers.${m.name}`); }
+            catch (err) { console.error(`Migration error suppliers.${m.name}:`, err.message); }
+        }
+    }
+
+    // Migrate parts table
+    const partColumns = db.pragma('table_info(parts)').map(col => col.name);
+    const partMigrations = [
+        { name: 'serial_number', sql: 'ALTER TABLE parts ADD COLUMN serial_number TEXT' },
+    ];
+    for (const m of partMigrations) {
+        if (!partColumns.includes(m.name)) {
+            try { db.exec(m.sql); console.log(`Migration: added parts.${m.name}`); }
+            catch (err) { console.error(`Migration error parts.${m.name}:`, err.message); }
+        }
+    }
+
+    // Migrate users table — account lockout columns
+    const userColumns = db.pragma('table_info(users)').map(col => col.name);
+    const userMigrations = [
+        { name: 'failed_attempts', sql: 'ALTER TABLE users ADD COLUMN failed_attempts INTEGER DEFAULT 0' },
+        { name: 'locked_until',    sql: 'ALTER TABLE users ADD COLUMN locked_until TEXT NULL' },
+    ];
+    for (const m of userMigrations) {
+        if (!userColumns.includes(m.name)) {
+            try { db.exec(m.sql); console.log(`Migration: added users.${m.name}`); }
+            catch (err) { console.error(`Migration error users.${m.name}:`, err.message); }
+        }
+    }
+
+    // Create audit_logs table
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS audit_logs (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            action       TEXT NOT NULL,
+            details      TEXT,
+            user_id      INTEGER,
+            ip_address   TEXT,
+            created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+    console.log('Audit logs table ready');
 };
 
 module.exports = { db, initDb };

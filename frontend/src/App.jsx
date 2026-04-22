@@ -12,6 +12,7 @@ import Parts from './pages/Parts';
 import Documents from './pages/Documents';
 import Reports from './pages/Reports';
 import Statement from './pages/Statement';
+import Users from './pages/Users';
 
 function App() {
     return (
@@ -30,6 +31,7 @@ function App() {
                     <Route path="/documents" element={<ProtectedRoute><Layout><Documents /></Layout></ProtectedRoute>} />
                     <Route path="/reports" element={<ProtectedRoute><Layout><Reports /></Layout></ProtectedRoute>} />
                     <Route path="/statement" element={<ProtectedRoute><Layout><Statement /></Layout></ProtectedRoute>} />
+                    <Route path="/users" element={<ProtectedRoute><Layout><Users /></Layout></ProtectedRoute>} />
 
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>

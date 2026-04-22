@@ -92,19 +92,39 @@ const Statement = () => {
         <>
             <style>{`
                 @media print {
+                    @page { size: A4 landscape; margin: 12mm 14mm; }
                     .no-print { display: none !important; }
                     .print-only { display: block !important; }
-                    aside, nav { display: none !important; }
+                    .print-letterhead { display: block !important; }
+                    aside, nav, header { display: none !important; }
                     main { margin-left: 0 !important; padding: 0 !important; }
-                    body { background: white !important; }
-                    .card { box-shadow: none !important; border: none !important; }
+                    body { background: white !important; font-size: 11px; }
+                    .card { box-shadow: none !important; border: 1px solid #d1d5db !important; }
                     .statement-table th,
-                    .statement-table td { font-size: 11px !important; padding: 4px 6px !important; }
+                    .statement-table td { font-size: 10px !important; padding: 4px 6px !important; }
                     .balance-negative { color: #dc2626 !important; }
+                    .overflow-x-auto { overflow: visible !important; }
                 }
+                .print-letterhead { display: none; }
             `}</style>
 
             <div className="animate-fade-in">
+                {/* Letterhead — visible only when printing */}
+                <div className="print-letterhead" style={{ borderBottom: '2px solid #1e3a5f', paddingBottom: '10px', marginBottom: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                        <div>
+                            <div style={{ fontSize: '20px', fontWeight: '800', color: '#1e3a5f', letterSpacing: '0.5px' }}>
+                                Jifs Company &amp; Gen Supp Ltd
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#4b5563', marginTop: '3px' }}>Supplier Statement</div>
+                        </div>
+                        <div style={{ textAlign: 'right', fontSize: '11px', color: '#4b5563', lineHeight: '1.6' }}>
+                            <div>P.O.Box 14, Ngara</div>
+                            <div>+255 784 223 819</div>
+                            <div>Printed: {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                        </div>
+                    </div>
+                </div>
                 {/* Error */}
                 {error && (
                     <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-6 no-print">

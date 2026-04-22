@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
 const Services = () => {
     const { user } = useAuth();
@@ -10,6 +11,7 @@ const Services = () => {
     const [error, setError] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    const [deleteModal, setDeleteModal] = useState({ open: false, id: null, name: '' });
     const [formData, setFormData] = useState({
         vehicle_id: '',
         service_date: new Date().toISOString().split('T')[0],
@@ -68,10 +70,14 @@ const Services = () => {
         setShowForm(true);
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this service record?')) return;
+    const handleDelete = (service) => {
+        const label = service.plate_no ? `${service.plate_no} — ${service.service_date}` : service.service_date;
+        setDeleteModal({ open: true, id: service.id, name: label });
+    };
+
+    const doDelete = async () => {
         try {
-            await api.delete(`/services/${id}`);
+            await api.delete(`/services/${deleteModal.id}`);
             fetchData();
         } catch (err) {
             setError(err.response?.data?.error || 'Delete failed. Please try again.');
@@ -109,6 +115,12 @@ const Services = () => {
 
     return (
         <div className="animate-fade-in">
+            <DeleteConfirmModal
+                isOpen={deleteModal.open}
+                onClose={() => setDeleteModal({ open: false, id: null, name: '' })}
+                onConfirm={doDelete}
+                itemName={deleteModal.name}
+            />
             {/* Error banner */}
             {error && (
                 <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-6">
@@ -276,7 +288,7 @@ const Services = () => {
                                             <button onClick={() => handleEdit(service)} className="link text-sm">
                                                 Edit
                                             </button>
-                                            <button onClick={() => handleDelete(service.id)} className="link link-danger text-sm">
+                                            <button onClick={() => handleDelete(service)} className="link link-danger text-sm">
                                                 Delete
                                             </button>
                                         </div>

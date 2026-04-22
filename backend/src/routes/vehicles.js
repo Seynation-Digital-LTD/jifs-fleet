@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../config/db');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { auditLog } = require('../middleware/security');
 
 const router = express.Router();
 
@@ -82,7 +83,9 @@ router.delete('/:id', isAdmin, (req, res) => {
         if (hasExpenses) {
             return res.status(400).json({ error: 'Cannot delete vehicle with existing expenses. Deactivate it instead.' });
         }
+        const vehicle = db.prepare('SELECT plate_no FROM vehicles WHERE id = ?').get(id);
         db.prepare('DELETE FROM vehicles WHERE id = ?').run(id);
+        auditLog('DELETE_VEHICLE', `Deleted vehicle: ${vehicle?.plate_no} (id=${id})`, req.session.user?.id, req);
         res.json({ message: 'Vehicle deleted' });
     } catch (error) {
         console.error('Delete vehicle error:', error);

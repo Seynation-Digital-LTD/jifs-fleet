@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../config/db');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { auditLog } = require('../middleware/security');
 
 const router = express.Router();
 
@@ -32,15 +33,15 @@ router.get('/:id', isAuthenticated, (req, res) => {
 // POST create supplier
 router.post('/', isAuthenticated, (req, res) => {
     try {
-        const { name, contact, type } = req.body;
-        
+        const { name, contact, type, type_label } = req.body;
+
         if (!name) {
             return res.status(400).json({ error: 'Supplier name is required' });
         }
-        
-        const stmt = db.prepare('INSERT INTO suppliers (name, contact, type) VALUES (?, ?, ?)');
-        const result = stmt.run(name, contact || null, type || 'other');
-        
+
+        const stmt = db.prepare('INSERT INTO suppliers (name, contact, type, type_label) VALUES (?, ?, ?, ?)');
+        const result = stmt.run(name, contact || null, type || 'other', type_label || null);
+
         res.status(201).json({
             message: 'Supplier created',
             supplierId: result.lastInsertRowid
@@ -55,21 +56,22 @@ router.post('/', isAuthenticated, (req, res) => {
 router.put('/:id', isAdmin, (req, res) => {
     try {
         const { id } = req.params;
-        const { name, contact, type } = req.body;
-        
+        const { name, contact, type, type_label } = req.body;
+
         const existing = db.prepare('SELECT * FROM suppliers WHERE id = ?').get(id);
         if (!existing) {
             return res.status(404).json({ error: 'Supplier not found' });
         }
-        
-        const stmt = db.prepare('UPDATE suppliers SET name = ?, contact = ?, type = ? WHERE id = ?');
+
+        const stmt = db.prepare('UPDATE suppliers SET name = ?, contact = ?, type = ?, type_label = ? WHERE id = ?');
         stmt.run(
             name || existing.name,
             contact !== undefined ? contact : existing.contact,
             type || existing.type,
+            type_label !== undefined ? type_label : existing.type_label,
             id
         );
-        
+
         res.json({ message: 'Supplier updated' });
     } catch (error) {
         console.error('Update supplier error:', error);
@@ -92,7 +94,9 @@ router.delete('/:id', isAdmin, (req, res) => {
             return res.status(400).json({ error: 'Cannot delete supplier with existing expenses' });
         }
         
+        const supplier = db.prepare('SELECT name FROM suppliers WHERE id = ?').get(id);
         db.prepare('DELETE FROM suppliers WHERE id = ?').run(id);
+        auditLog('DELETE_SUPPLIER', `Deleted supplier: ${supplier?.name} (id=${id})`, req.session.user?.id, req);
         res.json({ message: 'Supplier deleted' });
     } catch (error) {
         console.error('Delete supplier error:', error);

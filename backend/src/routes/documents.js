@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../config/db');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { auditLog } = require('../middleware/security');
 
 const router = express.Router();
 
@@ -75,9 +76,10 @@ router.put('/:id', isAuthenticated, (req, res) => {
 router.delete('/:id', isAdmin, (req, res) => {
     try {
         const { id } = req.params;
-        const existing = db.prepare('SELECT id FROM vehicle_documents WHERE id = ?').get(id);
-        if (!existing) return res.status(404).json({ error: 'Document not found' });
+        const doc = db.prepare('SELECT doc_type, doc_number, vehicle_id FROM vehicle_documents WHERE id = ?').get(id);
+        if (!doc) return res.status(404).json({ error: 'Document not found' });
         db.prepare('DELETE FROM vehicle_documents WHERE id = ?').run(id);
+        auditLog('DELETE_DOCUMENT', `Deleted doc: ${doc.doc_type} ${doc.doc_number || ''} vehicle_id=${doc.vehicle_id} (id=${id})`, req.session.user?.id, req);
         res.json({ message: 'Document deleted' });
     } catch (error) {
         console.error('Delete document error:', error);

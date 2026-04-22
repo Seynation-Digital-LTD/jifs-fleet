@@ -58,6 +58,11 @@ const Layout = ({ children }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
         )},
+        ...(user?.role === 'admin' ? [{ path: '/users', label: 'Manage Users', icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m4 6v-2m0-4a4 4 0 100-8 4 4 0 000 8zm6-4a3 3 0 100-6 3 3 0 000 6zM3 16a3 3 0 100-6 3 3 0 000 6z" />
+            </svg>
+        )}] : []),
     ];
 
     const isActive = (path) => location.pathname === path;
@@ -75,8 +80,8 @@ const Layout = ({ children }) => {
                             </svg>
                         </div>
                         <div>
-                            <h1 className="text-lg font-bold text-white tracking-tight">JIFS Fleet</h1>
-                            <p className="text-xs text-slate-400">Management System</p>
+                            <h1 className="text-sm font-bold text-white tracking-tight leading-tight">Jifs Company &</h1>
+                            <p className="text-xs text-slate-400">Gen Supp Ltd</p>
                         </div>
                     </div>
                 </div>

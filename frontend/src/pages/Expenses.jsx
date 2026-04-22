@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
 const PAYMENT_STATUS = [
     { value: 'unpaid', label: 'Unpaid', color: 'bg-red-100 text-red-700' },
@@ -22,6 +23,7 @@ const Expenses = () => {
     const [filterDateFrom, setFilterDateFrom] = useState('');
     const [filterDateTo, setFilterDateTo] = useState('');
     const [showForm, setShowForm] = useState(false);
+    const [deleteModal, setDeleteModal] = useState({ open: false, id: null, name: '' });
     const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState({
         vehicle_id: '',
@@ -128,10 +130,13 @@ const Expenses = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this expense?')) return;
+    const handleDelete = (expense) => {
+        setDeleteModal({ open: true, id: expense.id, name: `${expense.plate_no} — ${expense.date}` });
+    };
+
+    const doDelete = async () => {
         try {
-            await api.delete(`/expenses/${id}`);
+            await api.delete(`/expenses/${deleteModal.id}`);
             fetchData();
         } catch (err) {
             setError(err.response?.data?.error || 'Delete failed. Please try again.');
@@ -197,6 +202,12 @@ const Expenses = () => {
 
     return (
         <div className="animate-fade-in">
+            <DeleteConfirmModal
+                isOpen={deleteModal.open}
+                onClose={() => setDeleteModal({ open: false, id: null, name: '' })}
+                onConfirm={doDelete}
+                itemName={deleteModal.name}
+            />
             {error && (
                 <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-6">
                     <div className="flex items-center gap-2">
@@ -298,8 +309,11 @@ const Expenses = () => {
                                 </div>
                             )}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Reference No</label>
-                                <input type="text" value={formData.reference_no} onChange={e => setFormData({ ...formData, reference_no: e.target.value })} placeholder="INV-001" className="input" />
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Reference No
+                                    <span className="ml-2 text-xs font-normal text-blue-500">auto-generated</span>
+                                </label>
+                                <input type="text" value={formData.reference_no} onChange={e => setFormData({ ...formData, reference_no: e.target.value })} placeholder="Leave blank to auto-generate" className="input" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Type *</label>
@@ -440,7 +454,7 @@ const Expenses = () => {
                                                 <button onClick={() => handleEdit(expense)} className="link text-sm">Edit</button>
                                                 <button onClick={() => handleDuplicate(expense)} className="link text-sm text-gray-500" title="Duplicate this entry">Copy</button>
                                                 {isAdmin && (
-                                                    <button onClick={() => handleDelete(expense.id)} className="link link-danger text-sm">Del</button>
+                                                    <button onClick={() => handleDelete(expense)} className="link link-danger text-sm">Del</button>
                                                 )}
                                             </div>
                                         </td>

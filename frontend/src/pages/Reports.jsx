@@ -719,13 +719,36 @@ const Reports = () => {
         <>
             <style>{`
                 @media print {
+                    @page { size: A4 landscape; margin: 12mm 14mm; }
                     .no-print { display: none !important; }
-                    aside, nav { display: none !important; }
+                    aside, nav, header { display: none !important; }
                     main { margin-left: 0 !important; padding: 0 !important; }
-                    body { background: white !important; }
-                    .card { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+                    body { background: white !important; font-size: 11px; }
+                    .card { box-shadow: none !important; border: 1px solid #d1d5db !important; break-inside: avoid; }
+                    .print-letterhead { display: block !important; }
+                    table { font-size: 10px; width: 100%; }
+                    th, td { padding: 4px 6px !important; }
+                    .overflow-x-auto { overflow: visible !important; }
                 }
+                .print-letterhead { display: none; }
             `}</style>
+
+            {/* Letterhead — visible only when printing */}
+            <div className="print-letterhead" style={{ borderBottom: '2px solid #1e3a5f', paddingBottom: '10px', marginBottom: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <div>
+                        <div style={{ fontSize: '20px', fontWeight: '800', color: '#1e3a5f', letterSpacing: '0.5px' }}>
+                            Jifs Company &amp; Gen Supp Ltd
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#4b5563', marginTop: '3px' }}>Fleet Management Report</div>
+                    </div>
+                    <div style={{ textAlign: 'right', fontSize: '11px', color: '#4b5563', lineHeight: '1.6' }}>
+                        <div>P.O.Box 14, Ngara</div>
+                        <div>+255 784 223 819</div>
+                        <div>Printed: {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                    </div>
+                </div>
+            </div>
 
             <div className="animate-fade-in">
                 {/* Error */}

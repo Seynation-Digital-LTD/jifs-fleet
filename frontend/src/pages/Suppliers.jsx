@@ -1,6 +1,31 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
+
+// Predefined supplier categories. type maps to the DB enum; label is display name.
+const SUPPLIER_PRESETS = [
+    { type: 'fuel',        label: 'Fuel' },
+    { type: 'fuel',        label: 'Fuel Station' },
+    { type: 'maintenance', label: 'Maintenance & Repair' },
+    { type: 'maintenance', label: 'Mechanical Workshop' },
+    { type: 'other',       label: 'Tyres & Tubes' },
+    { type: 'other',       label: 'Lubricants & Oils' },
+    { type: 'other',       label: 'Parts & Spares' },
+    { type: 'other',       label: 'Transport Services' },
+    { type: 'other',       label: 'Electrical & Auto' },
+    { type: 'insurance',   label: 'Insurance' },
+    { type: 'other',       label: 'Security Services' },
+    { type: 'other',       label: 'Washing & Cleaning' },
+    { type: 'other',       label: 'Other (specify below)' },
+];
+
+const BADGE_COLORS = {
+    fuel: 'badge-info',
+    maintenance: 'badge-warning',
+    insurance: 'badge-success',
+    other: 'badge-danger',
+};
 
 const Suppliers = () => {
     const { user } = useAuth();
@@ -12,12 +37,13 @@ const Suppliers = () => {
     const [formData, setFormData] = useState({
         name: '',
         contact: '',
-        type: 'fuel'
+        preset: 'Fuel',
+        type_label: '',    // custom label when preset is 'Other (specify below)'
     });
 
-    useEffect(() => {
-        fetchSuppliers();
-    }, []);
+    const [deleteModal, setDeleteModal] = useState({ open: false, id: null, name: '' });
+
+    useEffect(() => { fetchSuppliers(); }, []);
 
     const fetchSuppliers = async () => {
         try {
@@ -30,13 +56,24 @@ const Suppliers = () => {
         }
     };
 
+    // Resolve DB type + display label from the form
+    const resolveTypeFields = () => {
+        const preset = SUPPLIER_PRESETS.find(p => p.label === formData.preset);
+        const isCustom = !preset || formData.preset === 'Other (specify below)';
+        const type = isCustom ? 'other' : preset.type;
+        const type_label = isCustom ? (formData.type_label || 'Other') : formData.preset;
+        return { type, type_label };
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const { type, type_label } = resolveTypeFields();
+            const payload = { name: formData.name, contact: formData.contact, type, type_label };
             if (editingId) {
-                await api.put(`/suppliers/${editingId}`, formData);
+                await api.put(`/suppliers/${editingId}`, payload);
             } else {
-                await api.post('/suppliers', formData);
+                await api.post('/suppliers', payload);
             }
             fetchSuppliers();
             resetForm();
@@ -46,19 +83,27 @@ const Suppliers = () => {
     };
 
     const handleEdit = (supplier) => {
+        // Find matching preset by type_label
+        const matchedPreset = SUPPLIER_PRESETS.find(p => p.label === supplier.type_label);
+        const preset = matchedPreset ? supplier.type_label : 'Other (specify below)';
+        const type_label = matchedPreset ? '' : (supplier.type_label || '');
         setFormData({
             name: supplier.name,
             contact: supplier.contact || '',
-            type: supplier.type
+            preset,
+            type_label,
         });
         setEditingId(supplier.id);
         setShowForm(true);
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this supplier?')) return;
+    const handleDelete = (supplier) => {
+        setDeleteModal({ open: true, id: supplier.id, name: supplier.name });
+    };
+
+    const doDelete = async () => {
         try {
-            await api.delete(`/suppliers/${id}`);
+            await api.delete(`/suppliers/${deleteModal.id}`);
             fetchSuppliers();
         } catch (err) {
             setError(err.response?.data?.error || 'Delete failed. Please try again.');
@@ -66,23 +111,25 @@ const Suppliers = () => {
     };
 
     const resetForm = () => {
-        setFormData({ name: '', contact: '', type: 'fuel' });
+        setFormData({ name: '', contact: '', preset: 'Fuel', type_label: '' });
         setEditingId(null);
         setShowForm(false);
     };
 
     const isAdmin = user?.role === 'admin';
+    const isCustomPreset = formData.preset === 'Other (specify below)';
 
-    const typeColors = {
-        fuel: 'badge-info',
-        maintenance: 'badge-warning',
-        insurance: 'badge-success',
-        other: 'badge-danger'
-    };
+    const getDisplayLabel = (supplier) => supplier.type_label || supplier.type;
 
     return (
         <div className="animate-fade-in">
-            {/* Error banner */}
+            <DeleteConfirmModal
+                isOpen={deleteModal.open}
+                onClose={() => setDeleteModal({ open: false, id: null, name: '' })}
+                onConfirm={doDelete}
+                itemName={deleteModal.name}
+            />
+
             {error && (
                 <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-6">
                     <div className="flex items-center gap-2">
@@ -99,11 +146,10 @@ const Suppliers = () => {
                 </div>
             )}
 
-            {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Suppliers</h1>
-                    <p className="text-gray-500 mt-1">Manage your service providers</p>
+                    <p className="text-gray-500 mt-1">Manage your service providers and vendors</p>
                 </div>
                 {isAdmin && (
                     <button onClick={() => setShowForm(!showForm)} className="btn btn-primary">
@@ -133,14 +179,14 @@ const Suppliers = () => {
                         {editingId ? 'Edit Supplier' : 'Add New Supplier'}
                     </h3>
                     <form onSubmit={handleSubmit}>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Name *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Supplier Name *</label>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="Supplier name"
+                                    placeholder="e.g. Total Energies, Kariakoo Auto"
                                     className="input"
                                     required
                                 />
@@ -156,19 +202,32 @@ const Suppliers = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Type *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Supply Category *</label>
                                 <select
-                                    value={formData.type}
-                                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                                    value={formData.preset}
+                                    onChange={(e) => setFormData({ ...formData, preset: e.target.value, type_label: '' })}
                                     className="input select"
                                     required
                                 >
-                                    <option value="fuel">Fuel</option>
-                                    <option value="maintenance">Maintenance</option>
-                                    <option value="insurance">Insurance</option>
-                                    <option value="other">Other</option>
+                                    {SUPPLIER_PRESETS.map(p => (
+                                        <option key={p.label} value={p.label}>{p.label}</option>
+                                    ))}
                                 </select>
                             </div>
+                            {isCustomPreset && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Specify Category *</label>
+                                    <input
+                                        type="text"
+                                        value={formData.type_label}
+                                        onChange={(e) => setFormData({ ...formData, type_label: e.target.value })}
+                                        placeholder="e.g. Spare parts, Canopy repair…"
+                                        className="input"
+                                        required
+                                        autoFocus
+                                    />
+                                </div>
+                            )}
                         </div>
                         <div className="flex gap-3 mt-5">
                             <button type="submit" className="btn btn-success">
@@ -186,7 +245,7 @@ const Suppliers = () => {
             <div className="card overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 ) : suppliers.length === 0 ? (
                     <div className="text-center py-12">
@@ -206,7 +265,7 @@ const Suppliers = () => {
                             <tr>
                                 <th>Name</th>
                                 <th>Contact</th>
-                                <th>Type</th>
+                                <th>Category</th>
                                 {isAdmin && <th>Actions</th>}
                             </tr>
                         </thead>
@@ -216,8 +275,8 @@ const Suppliers = () => {
                                     <td className="font-medium text-gray-900">{supplier.name}</td>
                                     <td className="text-gray-600">{supplier.contact || '-'}</td>
                                     <td>
-                                        <span className={`badge ${typeColors[supplier.type]}`}>
-                                            {supplier.type}
+                                        <span className={`badge ${BADGE_COLORS[supplier.type] || 'badge-info'}`}>
+                                            {getDisplayLabel(supplier)}
                                         </span>
                                     </td>
                                     {isAdmin && (
@@ -226,7 +285,7 @@ const Suppliers = () => {
                                                 <button onClick={() => handleEdit(supplier)} className="link text-sm">
                                                     Edit
                                                 </button>
-                                                <button onClick={() => handleDelete(supplier.id)} className="link link-danger text-sm">
+                                                <button onClick={() => handleDelete(supplier)} className="link link-danger text-sm">
                                                     Delete
                                                 </button>
                                             </div>

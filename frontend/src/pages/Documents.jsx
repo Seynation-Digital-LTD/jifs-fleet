@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
 const DOC_TYPES = [
     { value: 'tra_sticker', label: 'TRA Sticker' },
@@ -18,6 +19,7 @@ const Documents = () => {
     const [documents, setDocuments] = useState([]);
     const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [deleteModal, setDeleteModal] = useState({ open: false, id: null, name: '' });
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [filterType, setFilterType] = useState('');
@@ -83,10 +85,14 @@ const Documents = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('Delete this document?')) return;
+    const handleDelete = (doc) => {
+        const typeLabel = DOC_TYPES.find(t => t.value === doc.doc_type)?.label || doc.doc_type;
+        setDeleteModal({ open: true, id: doc.id, name: `${doc.plate_no} — ${typeLabel}` });
+    };
+
+    const doDelete = async () => {
         try {
-            await api.delete(`/documents/${id}`);
+            await api.delete(`/documents/${deleteModal.id}`);
             fetchData();
         } catch (err) {
             setError(err.response?.data?.error || 'Delete failed.');
@@ -137,6 +143,12 @@ const Documents = () => {
 
     return (
         <div className="animate-fade-in">
+            <DeleteConfirmModal
+                isOpen={deleteModal.open}
+                onClose={() => setDeleteModal({ open: false, id: null, name: '' })}
+                onConfirm={doDelete}
+                itemName={deleteModal.name}
+            />
             {error && (
                 <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-6">
                     <span className="text-sm">{error}</span>
@@ -309,7 +321,7 @@ const Documents = () => {
                                                 <div className="flex items-center gap-3">
                                                     <button onClick={() => handleEdit(doc)} className="link text-sm">Edit</button>
                                                     {isAdmin && (
-                                                        <button onClick={() => handleDelete(doc.id)} className="link link-danger text-sm">Delete</button>
+                                                        <button onClick={() => handleDelete(doc)} className="link link-danger text-sm">Delete</button>
                                                     )}
                                                 </div>
                                             </td>

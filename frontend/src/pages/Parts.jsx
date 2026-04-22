@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 
 const Parts = () => {
     const { user } = useAuth();
@@ -13,20 +14,21 @@ const Parts = () => {
     const [formData, setFormData] = useState({
         vehicle_id: '',
         part_number: '',
+        serial_number: '',
         part_name: '',
         installed_date: new Date().toISOString().split('T')[0],
-        expiry_date: ''
+        expiry_date: '',
     });
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    const [deleteModal, setDeleteModal] = useState({ open: false, id: null, name: '' });
+
+    useEffect(() => { fetchData(); }, []);
 
     const fetchData = async () => {
         try {
             const [partsRes, vehiclesRes] = await Promise.all([
                 api.get('/parts'),
-                api.get('/vehicles')
+                api.get('/vehicles'),
             ]);
             setParts(partsRes.data.parts);
             setVehicles(vehiclesRes.data.vehicles.filter(v => v.status === 'active'));
@@ -56,18 +58,23 @@ const Parts = () => {
         setFormData({
             vehicle_id: part.vehicle_id,
             part_number: part.part_number || '',
+            serial_number: part.serial_number || '',
             part_name: part.part_name,
             installed_date: part.installed_date || new Date().toISOString().split('T')[0],
-            expiry_date: part.expiry_date || ''
+            expiry_date: part.expiry_date || '',
         });
         setEditingId(part.id);
         setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this part?')) return;
+    const handleDelete = (part) => {
+        setDeleteModal({ open: true, id: part.id, name: `${part.part_name} (${part.plate_no})` });
+    };
+
+    const doDelete = async () => {
         try {
-            await api.delete(`/parts/${id}`);
+            await api.delete(`/parts/${deleteModal.id}`);
             fetchData();
         } catch (err) {
             setError(err.response?.data?.error || 'Delete failed. Please try again.');
@@ -78,9 +85,10 @@ const Parts = () => {
         setFormData({
             vehicle_id: '',
             part_number: '',
+            serial_number: '',
             part_name: '',
             installed_date: new Date().toISOString().split('T')[0],
-            expiry_date: ''
+            expiry_date: '',
         });
         setEditingId(null);
         setShowForm(false);
@@ -88,27 +96,31 @@ const Parts = () => {
 
     const formatDate = (dateStr) => {
         if (!dateStr) return '-';
-        return new Date(dateStr).toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
+        return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-GB', {
+            day: '2-digit', month: 'short', year: 'numeric',
         });
     };
 
     const getExpiryStatus = (dateStr) => {
         if (!dateStr) return null;
-        const date = new Date(dateStr);
-        const today = new Date();
-        const diffDays = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays < 0) return 'expired';
-        if (diffDays <= 30) return 'expiring';
+        const days = Math.ceil((new Date(dateStr + 'T00:00:00') - new Date().setHours(0, 0, 0, 0)) / 86400000);
+        if (days < 0) return 'expired';
+        if (days <= 30) return 'expiring';
         return 'ok';
     };
 
+    // Show serial number field prominently when part name contains tyre/tire
+    const isTyre = formData.part_name.toLowerCase().match(/tyre|tire|wheel/);
+
     return (
         <div className="animate-fade-in">
-            {/* Error banner */}
+            <DeleteConfirmModal
+                isOpen={deleteModal.open}
+                onClose={() => setDeleteModal({ open: false, id: null, name: '' })}
+                onConfirm={doDelete}
+                itemName={deleteModal.name}
+            />
+
             {error && (
                 <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-6">
                     <div className="flex items-center gap-2">
@@ -125,7 +137,6 @@ const Parts = () => {
                 </div>
             )}
 
-            {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Parts</h1>
@@ -157,7 +168,7 @@ const Parts = () => {
                         {editingId ? 'Edit Part' : 'Add New Part'}
                     </h3>
                     <form onSubmit={handleSubmit}>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Vehicle *</label>
                                 <select
@@ -173,24 +184,37 @@ const Parts = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Part Number</label>
-                                <input
-                                    type="text"
-                                    value={formData.part_number}
-                                    onChange={(e) => setFormData({ ...formData, part_number: e.target.value })}
-                                    placeholder="ABC-123"
-                                    className="input"
-                                />
-                            </div>
-                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Part Name *</label>
                                 <input
                                     type="text"
                                     value={formData.part_name}
                                     onChange={(e) => setFormData({ ...formData, part_name: e.target.value })}
-                                    placeholder="Oil filter, brake pads..."
+                                    placeholder="Oil filter, Tyre, Brake pads…"
                                     className="input"
                                     required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Part Number</label>
+                                <input
+                                    type="text"
+                                    value={formData.part_number}
+                                    onChange={(e) => setFormData({ ...formData, part_number: e.target.value })}
+                                    placeholder="e.g. OFT-445"
+                                    className="input"
+                                />
+                            </div>
+                            <div className={isTyre ? 'ring-2 ring-amber-400 rounded-xl p-1 -m-1' : ''}>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Serial Number
+                                    {isTyre && <span className="ml-2 text-amber-600 font-semibold text-xs">← Required for tyres</span>}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.serial_number}
+                                    onChange={(e) => setFormData({ ...formData, serial_number: e.target.value })}
+                                    placeholder={isTyre ? 'Tyre serial number (DOT code)' : 'Serial or chassis number'}
+                                    className="input"
                                 />
                             </div>
                             <div>
@@ -228,7 +252,7 @@ const Parts = () => {
             <div className="card overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 ) : parts.length === 0 ? (
                     <div className="text-center py-12">
@@ -245,8 +269,9 @@ const Parts = () => {
                         <thead>
                             <tr>
                                 <th>Vehicle</th>
-                                <th>Part No</th>
                                 <th>Part Name</th>
+                                <th>Part No</th>
+                                <th>Serial No</th>
                                 <th>Installed</th>
                                 <th>Expiry</th>
                                 <th>Actions</th>
@@ -258,8 +283,9 @@ const Parts = () => {
                                 return (
                                     <tr key={part.id} className={expiryStatus === 'expired' ? 'bg-red-50' : expiryStatus === 'expiring' ? 'bg-amber-50' : ''}>
                                         <td className="font-medium text-gray-900">{part.plate_no}</td>
-                                        <td className="text-gray-600">{part.part_number || '-'}</td>
                                         <td className="text-gray-900">{part.part_name}</td>
+                                        <td className="text-gray-500 font-mono text-xs">{part.part_number || '-'}</td>
+                                        <td className="text-gray-500 font-mono text-xs">{part.serial_number || '-'}</td>
                                         <td className="text-gray-600">{formatDate(part.installed_date)}</td>
                                         <td>
                                             {part.expiry_date ? (
@@ -273,12 +299,8 @@ const Parts = () => {
                                         </td>
                                         <td>
                                             <div className="flex items-center gap-3">
-                                                <button onClick={() => handleEdit(part)} className="link text-sm">
-                                                    Edit
-                                                </button>
-                                                <button onClick={() => handleDelete(part.id)} className="link link-danger text-sm">
-                                                    Delete
-                                                </button>
+                                                <button onClick={() => handleEdit(part)} className="link text-sm">Edit</button>
+                                                <button onClick={() => handleDelete(part)} className="link link-danger text-sm">Delete</button>
                                             </div>
                                         </td>
                                     </tr>
