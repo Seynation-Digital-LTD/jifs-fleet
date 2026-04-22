@@ -20,6 +20,10 @@ if [ ! -d "$DIR/backend/node_modules" ]; then
     cd "$DIR/backend" && npm install >> "$LOG" 2>&1
 fi
 
+# ── Rebuild native modules for current Node version (handles copy-to-new-Mac) ─
+echo "Rebuilding native modules..." | tee -a "$LOG"
+cd "$DIR/backend" && npm rebuild better-sqlite3 >> "$LOG" 2>&1
+
 # ── Build frontend if dist is missing or stale ────────────────────────────
 DIST="$DIR/frontend/dist/index.html"
 SRC_NEWER=false

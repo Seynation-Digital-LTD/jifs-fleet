@@ -189,11 +189,10 @@ const Statement = () => {
                             <button
                                 type="button"
                                 onClick={() => setSelectedSuppliers([])}
-                                className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-                                    selectedSuppliers.length === 0
-                                        ? 'bg-blue-600 text-white border-blue-600'
-                                        : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
-                                }`}
+                                className="px-3 py-1.5 rounded-lg text-sm font-medium border transition-all"
+                                style={selectedSuppliers.length === 0
+                                    ? { background: 'linear-gradient(135deg,#c47f17,#a86c10)', color: '#fff', borderColor: '#c47f17' }
+                                    : { background: '#fff', color: '#374151', borderColor: '#d1d5db' }}
                             >
                                 All Suppliers
                             </button>
@@ -202,11 +201,10 @@ const Statement = () => {
                                     key={s.id}
                                     type="button"
                                     onClick={() => toggleSupplier(s.id)}
-                                    className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-                                        selectedSuppliers.includes(s.id)
-                                            ? 'bg-blue-600 text-white border-blue-600'
-                                            : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
-                                    }`}
+                                    className="px-3 py-1.5 rounded-lg text-sm font-medium border transition-all"
+                                    style={selectedSuppliers.includes(s.id)
+                                        ? { background: 'linear-gradient(135deg,#c47f17,#a86c10)', color: '#fff', borderColor: '#c47f17' }
+                                        : { background: '#fff', color: '#374151', borderColor: '#d1d5db' }}
                                 >
                                     {s.name}
                                 </button>
@@ -242,7 +240,7 @@ const Statement = () => {
                         <div className="px-6 pt-6 pb-4 border-b border-gray-100">
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <h2 className="text-xl font-bold text-gray-900">JIFS Fleet Management</h2>
+                                    <h2 className="text-xl font-bold text-gray-900">Jifs Company &amp; Gen Supp Ltd</h2>
                                     <p className="text-sm text-gray-500 mt-0.5">Supplier Ledger Statement</p>
                                 </div>
                                 <div className="text-right text-sm text-gray-600">
@@ -329,11 +327,11 @@ const Statement = () => {
                                         <p className="text-xs font-semibold text-green-500 uppercase tracking-wider mb-1">Total Credit</p>
                                         <p className="text-xl font-bold text-green-700">{formatNumber(summary.total_credit)}</p>
                                     </div>
-                                    <div className={`rounded-lg p-4 ${summary.final_balance < 0 ? 'bg-red-50' : 'bg-blue-50'}`}>
-                                        <p className={`text-xs font-semibold uppercase tracking-wider mb-1 ${summary.final_balance < 0 ? 'text-red-500' : 'text-blue-500'}`}>
+                                    <div className={`rounded-lg p-4 ${summary.final_balance < 0 ? 'bg-red-50' : 'bg-amber-50'}`}>
+                                        <p className={`text-xs font-semibold uppercase tracking-wider mb-1 ${summary.final_balance < 0 ? 'text-red-500' : 'text-amber-600'}`}>
                                             Closing Balance
                                         </p>
-                                        <p className={`text-xl font-bold ${summary.final_balance < 0 ? 'text-red-700' : 'text-blue-700'}`}>
+                                        <p className={`text-xl font-bold ${summary.final_balance < 0 ? 'text-red-700' : 'text-amber-700'}`}>
                                             {formatNumber(summary.final_balance)}
                                         </p>
                                     </div>

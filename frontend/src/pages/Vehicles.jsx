@@ -247,7 +247,7 @@ const Vehicles = () => {
                 {(searchQuery || filterStatus) && (
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                         <p className="text-sm text-gray-500">{filteredVehicles.length} result{filteredVehicles.length !== 1 ? 's' : ''}</p>
-                        <button onClick={() => { setSearchQuery(''); setFilterStatus(''); }} className="text-sm text-blue-600 hover:underline">Clear filters</button>
+                        <button onClick={() => { setSearchQuery(''); setFilterStatus(''); }} className="text-sm hover:underline" style={{ color: "#c47f17" }}>Clear filters</button>
                     </div>
                 )}
             </div>
@@ -287,7 +287,7 @@ const Vehicles = () => {
                             </div>
                         </div>
                         {editingId && (
-                            <p className="text-xs text-blue-600 mb-4">
+                            <p className="text-xs mb-4" style={{ color: "#c47f17" }}>
                                 <svg className="w-3.5 h-3.5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 To manage documents for this vehicle, save changes then click "View Details" on the vehicle row.
                             </p>
@@ -304,14 +304,14 @@ const Vehicles = () => {
             <div className="card overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-[3px] border-t-transparent rounded-full animate-spin" style={{ borderColor: '#c47f17', borderTopColor: 'transparent' }}></div>
                     </div>
                 ) : filteredVehicles.length === 0 ? (
                     <div className="text-center py-12">
                         <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 17h8M8 17v-4m8 4v-4m-8 0h8m-8 0V9a4 4 0 014-4h0a4 4 0 014 4v4" /></svg>
                         <p className="text-gray-500 mb-2">{vehicles.length === 0 ? 'No vehicles found' : 'No vehicles match your filters'}</p>
                         {vehicles.length === 0 && isAdmin && (
-                            <button onClick={() => setShowForm(true)} className="text-blue-600 font-medium hover:underline">Add your first vehicle</button>
+                            <button onClick={() => setShowForm(true)} className="font-medium hover:underline" style={{ color: "#c47f17" }}>Add your first vehicle</button>
                         )}
                     </div>
                 ) : (
@@ -332,11 +332,11 @@ const Vehicles = () => {
                                 <>
                                     <tr
                                         key={vehicle.id}
-                                        className={`cursor-pointer transition-colors ${detailId === vehicle.id ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                                        className={`cursor-pointer transition-colors ${detailId === vehicle.id ? '' : 'hover:bg-gray-50'}`} style={detailId === vehicle.id ? { background: 'rgba(196,127,23,0.06)' } : {}}
                                         onClick={() => loadDetail(vehicle.id)}
                                     >
                                         <td className="font-semibold text-gray-900 flex items-center gap-2">
-                                            <svg className={`w-3.5 h-3.5 transition-transform ${detailId === vehicle.id ? 'rotate-90 text-blue-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className={`w-3.5 h-3.5 transition-transform ${detailId === vehicle.id ? 'rotate-90' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                             </svg>
                                             {vehicle.plate_no}
@@ -352,7 +352,7 @@ const Vehicles = () => {
                                         </td>
                                         <td onClick={e => e.stopPropagation()}>
                                             <div className="flex items-center gap-3">
-                                                <button onClick={() => loadDetail(vehicle.id)} className="link text-sm text-blue-600">
+                                                <button onClick={() => loadDetail(vehicle.id)} className="link text-sm">
                                                     {detailId === vehicle.id ? 'Hide' : 'Details'}
                                                 </button>
                                                 {isAdmin && (
@@ -368,11 +368,11 @@ const Vehicles = () => {
                                     {/* ── Detail Panel ── */}
                                     {detailId === vehicle.id && (
                                         <tr key={`detail-${vehicle.id}`}>
-                                            <td colSpan={7} className="bg-blue-50/50 p-0 border-b border-blue-100">
+                                            <td colSpan={7} className="p-0 border-b" style={{ background: "rgba(196,127,23,0.04)", borderColor: "rgba(196,127,23,0.15)" }}>
                                                 <div className="p-5">
                                                     {detailLoading ? (
                                                         <div className="flex items-center gap-3 py-4 text-gray-500">
-                                                            <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                                            <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: "#c47f17", borderTopColor: "transparent" }}></div>
                                                             Loading vehicle details…
                                                         </div>
                                                     ) : detailData ? (
@@ -387,7 +387,7 @@ const Vehicles = () => {
                                                                     <button
                                                                         key={t.id}
                                                                         onClick={() => setDetailTab(t.id)}
-                                                                        className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${detailTab === t.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300'}`}
+                                                                        className="px-3 py-1.5 rounded-lg text-sm font-medium border transition-all" style={detailTab === t.id ? { background: 'linear-gradient(135deg,#c47f17,#a86c10)', color: '#fff', borderColor: '#c47f17' } : { background: '#fff', color: '#4b5563', borderColor: '#e5e7eb' }}
                                                                     >
                                                                         {t.label}
                                                                     </button>
@@ -440,7 +440,7 @@ const Vehicles = () => {
 
                                                                     {/* Add Doc mini-form */}
                                                                     {showDocForm ? (
-                                                                        <form onSubmit={handleSaveDoc} className="bg-white rounded-xl border border-blue-200 p-4">
+                                                                        <form onSubmit={handleSaveDoc} className="bg-white rounded-xl p-4" style={{ border: "1.5px solid rgba(196,127,23,0.3)" }}>
                                                                             <p className="text-sm font-semibold text-gray-800 mb-3">Add Document for {vehicle.plate_no}</p>
                                                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
                                                                                 <div>
@@ -472,7 +472,7 @@ const Vehicles = () => {
                                                                             </div>
                                                                         </form>
                                                                     ) : (
-                                                                        <button onClick={() => setShowDocForm(true)} className="flex items-center gap-2 text-sm text-blue-600 font-medium hover:underline">
+                                                                        <button onClick={() => setShowDocForm(true)} className="flex items-center gap-2 text-sm font-medium hover:underline" style={{ color: "#c47f17" }}>
                                                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                                                             Add Document
                                                                         </button>

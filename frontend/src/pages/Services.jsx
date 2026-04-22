@@ -242,7 +242,7 @@ const Services = () => {
             <div className="card overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 rounded-full animate-spin" style={{ border: "3px solid #c47f17", borderTopColor: "transparent" }}></div>
                     </div>
                 ) : services.length === 0 ? (
                     <div className="text-center py-12">
@@ -251,7 +251,7 @@ const Services = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                         <p className="text-gray-500 mb-2">No services recorded</p>
-                        <button onClick={() => setShowForm(true)} className="text-blue-600 font-medium hover:underline">
+                        <button onClick={() => setShowForm(true)} className="font-medium hover:underline" style={{ color: "#c47f17" }}>
                             Record your first service
                         </button>
                     </div>

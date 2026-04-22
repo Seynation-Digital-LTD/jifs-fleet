@@ -252,7 +252,7 @@ const Parts = () => {
             <div className="card overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-[3px] border-t-transparent rounded-full animate-spin" style={{ borderColor: '#c47f17', borderTopColor: 'transparent' }}></div>
                     </div>
                 ) : parts.length === 0 ? (
                     <div className="text-center py-12">
@@ -260,7 +260,7 @@ const Parts = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
                         </svg>
                         <p className="text-gray-500 mb-2">No parts recorded</p>
-                        <button onClick={() => setShowForm(true)} className="text-blue-600 font-medium hover:underline">
+                        <button onClick={() => setShowForm(true)} className="font-medium hover:underline" style={{ color: "#c47f17" }}>
                             Add your first part
                         </button>
                     </div>

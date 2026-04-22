@@ -47,7 +47,7 @@ const Dashboard = () => {
         return (
             <div className="flex items-center justify-center h-64">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-10 h-10 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-10 h-10 border-[3px] border-t-transparent rounded-full animate-spin" style={{ borderColor: '#c47f17', borderTopColor: 'transparent' }}></div>
                     <p className="text-gray-500">Loading dashboard...</p>
                 </div>
             </div>
@@ -66,7 +66,7 @@ const Dashboard = () => {
         {
             label: 'Active Vehicles', value: stats?.activeVehicles || 0,
             icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 17h8M8 17v-4m8 4v-4m-8 0h8m-8 0V9a4 4 0 014-4h0a4 4 0 014 4v4" /></svg>,
-            gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/30'
+            gradient: 'from-amber-500 to-amber-600', shadow: 'shadow-amber-500/30'
         },
         {
             label: 'Suppliers', value: stats?.totalSuppliers || 0,
@@ -103,25 +103,31 @@ const Dashboard = () => {
 
             {/* Quick Start */}
             {!setupComplete && (
-                <div className="card p-6 mb-8 border-2 border-dashed border-blue-200 bg-blue-50/50">
+                <div className="card p-6 mb-8 border-2 border-dashed" style={{ borderColor: '#c47f17', background: 'rgba(196,127,23,0.04)' }}>
                     <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
-                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(196,127,23,0.12)' }}>
+                            <svg className="w-5 h-5" style={{ color: '#c47f17' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
                         <div className="flex-1">
-                            <h3 className="font-semibold text-blue-900 mb-1">Get started in 3 steps</h3>
-                            <p className="text-sm text-blue-700 mb-4">Complete these steps once and you'll be ready to log transactions and generate statements.</p>
+                            <h3 className="font-semibold mb-1" style={{ color: '#7a5010' }}>Get started in 3 steps</h3>
+                            <p className="text-sm mb-4" style={{ color: '#a86c10' }}>Complete these steps once and you'll be ready to log transactions and generate statements.</p>
                             <div className="flex flex-col sm:flex-row gap-3">
-                                <Link to="/vehicles" className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-all ${hasVehicles ? 'border-green-400 bg-green-50 text-green-700' : 'border-blue-300 bg-white text-blue-700 hover:border-blue-500'}`}>
-                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${hasVehicles ? 'bg-green-400 text-white' : 'bg-blue-600 text-white'}`}>{hasVehicles ? '✓' : '1'}</div>
+                                <Link to="/vehicles" className="flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-all"
+                                    style={hasVehicles ? { borderColor: '#4ade80', background: '#f0fdf4', color: '#15803d' } : { borderColor: '#c47f17', background: '#fff', color: '#a86c10' }}>
+                                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 text-white"
+                                        style={{ background: hasVehicles ? '#4ade80' : '#c47f17' }}>{hasVehicles ? '✓' : '1'}</div>
                                     <div><p className="font-medium text-sm">Add your trucks</p><p className="text-xs opacity-70">Register each vehicle by plate number</p></div>
                                 </Link>
-                                <Link to="/suppliers" className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-all ${hasSuppliers ? 'border-green-400 bg-green-50 text-green-700' : 'border-blue-300 bg-white text-blue-700 hover:border-blue-500'}`}>
-                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${hasSuppliers ? 'bg-green-400 text-white' : 'bg-blue-600 text-white'}`}>{hasSuppliers ? '✓' : '2'}</div>
+                                <Link to="/suppliers" className="flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-all"
+                                    style={hasSuppliers ? { borderColor: '#4ade80', background: '#f0fdf4', color: '#15803d' } : { borderColor: '#c47f17', background: '#fff', color: '#a86c10' }}>
+                                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 text-white"
+                                        style={{ background: hasSuppliers ? '#4ade80' : '#c47f17' }}>{hasSuppliers ? '✓' : '2'}</div>
                                     <div><p className="font-medium text-sm">Add your suppliers</p><p className="text-xs opacity-70">E.g. Said Salim Bakhresa & Co.</p></div>
                                 </Link>
-                                <Link to="/expenses" className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-all ${!setupComplete ? 'border-gray-200 bg-gray-50 text-gray-400 pointer-events-none' : 'border-blue-300 bg-white text-blue-700 hover:border-blue-500'}`}>
-                                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${!setupComplete ? 'bg-gray-300 text-white' : 'bg-blue-600 text-white'}`}>3</div>
+                                <Link to="/expenses" className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-all ${!setupComplete ? 'border-gray-200 bg-gray-50 text-gray-400 pointer-events-none' : ''}`}
+                                    style={setupComplete ? { borderColor: '#c47f17', background: '#fff', color: '#a86c10' } : {}}>
+                                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 text-white"
+                                        style={{ background: setupComplete ? '#c47f17' : '#d1d5db' }}>3</div>
                                     <div><p className="font-medium text-sm">Log transactions</p><p className="text-xs opacity-70">Record debits, credits, truck deliveries</p></div>
                                 </Link>
                             </div>
@@ -134,8 +140,10 @@ const Dashboard = () => {
             {setupComplete && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                     <Link to="/expenses" className="flex items-center gap-3 p-4 card hover:shadow-md transition-shadow group">
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                            <svg className="w-5 h-5 text-blue-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors" style={{ background: 'rgba(196,127,23,0.12)' }}
+                            onMouseEnter={e => e.currentTarget.style.background = '#c47f17'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(196,127,23,0.12)'}>
+                            <svg className="w-5 h-5" style={{ color: '#c47f17' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                         </div>
                         <div><p className="font-semibold text-gray-900 text-sm">Log a Transaction</p><p className="text-xs text-gray-500">Record a debit or credit entry</p></div>
                     </Link>
@@ -292,7 +300,7 @@ const Dashboard = () => {
                                 {expiringDocCount > 0 && `${expiringDocCount} expiring within 60 days`}
                             </p>
                         </div>
-                        <Link to="/documents" className="ml-auto text-sm text-blue-600 hover:underline font-medium">Manage →</Link>
+                        <Link to="/documents" className="ml-auto text-sm font-medium hover:underline" style={{ color: '#c47f17' }}>Manage →</Link>
                     </div>
                     <div className="space-y-2">
                         {[...(stats?.overdueDocuments || []).map(d => ({ ...d, overdue: true })), ...(stats?.expiringDocuments || [])].slice(0, 6).map((d, i) => {

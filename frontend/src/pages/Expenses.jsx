@@ -264,7 +264,7 @@ const Expenses = () => {
                 {hasFilters && (
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                         <p className="text-sm text-gray-500">{filteredExpenses.length} result{filteredExpenses.length !== 1 ? 's' : ''}</p>
-                        <button onClick={() => { setSearchQuery(''); setFilterType(''); setFilterPayment(''); setFilterDateFrom(''); setFilterDateTo(''); }} className="text-sm text-blue-600 hover:underline">Clear filters</button>
+                        <button onClick={() => { setSearchQuery(''); setFilterType(''); setFilterPayment(''); setFilterDateFrom(''); setFilterDateTo(''); }} className="text-sm hover:underline" style={{ color: "#c47f17" }}>Clear filters</button>
                     </div>
                 )}
             </div>
@@ -311,7 +311,7 @@ const Expenses = () => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                     Reference No
-                                    <span className="ml-2 text-xs font-normal text-blue-500">auto-generated</span>
+                                    <span className="ml-2 text-xs font-normal" style={{ color: "#c47f17" }}>auto-generated</span>
                                 </label>
                                 <input type="text" value={formData.reference_no} onChange={e => setFormData({ ...formData, reference_no: e.target.value })} placeholder="Leave blank to auto-generate" className="input" />
                             </div>
@@ -381,7 +381,7 @@ const Expenses = () => {
             <div className="card overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-[3px] border-t-transparent rounded-full animate-spin" style={{ borderColor: '#c47f17', borderTopColor: 'transparent' }}></div>
                     </div>
                 ) : filteredExpenses.length === 0 ? (
                     <div className="text-center py-12 px-6">
@@ -403,7 +403,7 @@ const Expenses = () => {
                             <>
                                 <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 <p className="text-gray-500 mb-2">No transactions yet</p>
-                                <button onClick={() => setShowForm(true)} className="text-blue-600 font-medium hover:underline">Record your first transaction</button>
+                                <button onClick={() => setShowForm(true)} className="font-medium hover:underline" style={{ color: "#c47f17" }}>Record your first transaction</button>
                             </>
                         ) : (
                             <>

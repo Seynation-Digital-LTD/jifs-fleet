@@ -160,7 +160,7 @@ const Users = () => {
                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-xs font-semibold">Admin</span>
                                 </th>
                                 <th className="pb-2 font-medium text-center w-24">
-                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">Operator</span>
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold" style={{ background: "rgba(196,127,23,0.12)", color: "#a86c10" }}>Operator</span>
                                 </th>
                             </tr>
                         </thead>
@@ -229,7 +229,7 @@ const Users = () => {
             <div className="card overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-[3px] border-t-transparent rounded-full animate-spin" style={{ borderColor: '#c47f17', borderTopColor: 'transparent' }}></div>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
@@ -257,14 +257,14 @@ const Users = () => {
                                                         {u.username.charAt(0).toUpperCase()}
                                                     </div>
                                                     <span className="font-semibold text-gray-900">{u.username}</span>
-                                                    {isMe && <span className="text-xs text-blue-600 font-medium">(you)</span>}
+                                                    {isMe && <span className="text-xs font-medium" style={{ color: "#c47f17" }}>(you)</span>}
                                                 </div>
                                             </td>
                                             <td>
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                                                     u.role === 'admin'
                                                         ? 'bg-purple-100 text-purple-700'
-                                                        : 'bg-blue-100 text-blue-700'
+                                                        : '' } style={role === 'operator' ? { background: 'rgba(196,127,23,0.12)', color: '#a86c10' } : {}
                                                 }`}>
                                                     {u.role === 'admin' ? 'Admin' : 'Operator'}
                                                 </span>
@@ -324,7 +324,7 @@ const Users = () => {
                                 {/* Permission preview for chosen role */}
                                 <div className="rounded-lg bg-gray-50 border border-gray-100 p-4">
                                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                                        What <span className="text-gray-700">{editUser.username}</span> can do as <span className={editRole === 'admin' ? 'text-purple-600' : 'text-blue-600'}>{editRole}</span>:
+                                        What <span className="text-gray-700">{editUser.username}</span> can do as <span className={editRole === 'admin' ? 'text-purple-600' : ''}>{editRole}</span>:
                                     </p>
                                     <ul className="space-y-1">
                                         {PERMISSIONS.map((p, i) => {

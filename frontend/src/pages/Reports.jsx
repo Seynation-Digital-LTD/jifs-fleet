@@ -196,7 +196,7 @@ const Reports = () => {
         if (loading) {
             return (
                 <div className="flex items-center justify-center py-20">
-                    <div className="w-8 h-8 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-[3px] border-t-transparent rounded-full animate-spin" style={{ borderColor: '#c47f17', borderTopColor: 'transparent' }}></div>
                 </div>
             );
         }
@@ -740,7 +740,7 @@ const Reports = () => {
                         <div style={{ fontSize: '20px', fontWeight: '800', color: '#1e3a5f', letterSpacing: '0.5px' }}>
                             Jifs Company &amp; Gen Supp Ltd
                         </div>
-                        <div style={{ fontSize: '11px', color: '#4b5563', marginTop: '3px' }}>Fleet Management Report</div>
+                        <div style={{ fontSize: '11px', color: '#4b5563', marginTop: '3px' }}>Operations Report</div>
                     </div>
                     <div style={{ textAlign: 'right', fontSize: '11px', color: '#4b5563', lineHeight: '1.6' }}>
                         <div>P.O.Box 14, Ngara</div>
@@ -786,11 +786,10 @@ const Reports = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => handleTabChange(tab.id)}
-                                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border transition-all ${
-                                    activeTab === tab.id
-                                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                                        : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
-                                }`}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border transition-all"
+                                style={activeTab === tab.id
+                                    ? { background: 'linear-gradient(135deg, #c47f17, #a86c10)', color: '#fff', borderColor: '#c47f17', boxShadow: '0 2px 8px rgba(196,127,23,0.35)' }
+                                    : { background: '#fff', color: '#6b7280', borderColor: '#e5e7eb' }}
                             >
                                 {tab.icon}
                                 {tab.label}
@@ -841,7 +840,7 @@ const Reports = () => {
                     <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                         <div>
                             <div className="flex items-center gap-2">
-                                <span className="text-blue-600">{activeTabDef?.icon}</span>
+                                <span style={{ color: '#c47f17' }}>{activeTabDef?.icon}</span>
                                 <h2 className="font-bold text-gray-900">{activeTabDef?.label}</h2>
                             </div>
                             <p className="text-sm text-gray-500 mt-0.5">{activeTabDef?.desc}</p>

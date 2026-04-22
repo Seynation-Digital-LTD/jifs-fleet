@@ -245,7 +245,7 @@ const Suppliers = () => {
             <div className="card overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-[3px] border-t-transparent rounded-full animate-spin" style={{ borderColor: '#c47f17', borderTopColor: 'transparent' }}></div>
                     </div>
                 ) : suppliers.length === 0 ? (
                     <div className="text-center py-12">
@@ -254,7 +254,7 @@ const Suppliers = () => {
                         </svg>
                         <p className="text-gray-500 mb-2">No suppliers found</p>
                         {isAdmin && (
-                            <button onClick={() => setShowForm(true)} className="text-blue-600 font-medium hover:underline">
+                            <button onClick={() => setShowForm(true)} className="font-medium hover:underline" style={{ color: "#c47f17" }}>
                                 Add your first supplier
                             </button>
                         )}

@@ -212,7 +212,7 @@ const Documents = () => {
                 {(searchQuery || filterType || filterStatus) && (
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                         <p className="text-sm text-gray-500">{filtered.length} result{filtered.length !== 1 ? 's' : ''}</p>
-                        <button onClick={() => { setSearchQuery(''); setFilterType(''); setFilterStatus(''); }} className="text-sm text-blue-600 hover:underline">Clear filters</button>
+                        <button onClick={() => { setSearchQuery(''); setFilterType(''); setFilterStatus(''); }} className="text-sm hover:underline" style={{ color: "#c47f17" }}>Clear filters</button>
                     </div>
                 )}
             </div>
@@ -269,7 +269,7 @@ const Documents = () => {
             <div className="card overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-[3px] border-t-transparent rounded-full animate-spin" style={{ borderColor: '#c47f17', borderTopColor: 'transparent' }}></div>
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="text-center py-12">
@@ -278,7 +278,7 @@ const Documents = () => {
                         </svg>
                         <p className="text-gray-500 mb-2">{documents.length === 0 ? 'No documents added yet' : 'No documents match your filters'}</p>
                         {documents.length === 0 && (
-                            <button onClick={() => setShowForm(true)} className="text-blue-600 font-medium hover:underline">Add your first document</button>
+                            <button onClick={() => setShowForm(true)} className="font-medium hover:underline" style={{ color: "#c47f17" }}>Add your first document</button>
                         )}
                     </div>
                 ) : (
