@@ -734,20 +734,36 @@ const Reports = () => {
             `}</style>
 
             {/* Letterhead — visible only when printing */}
-            <div className="print-letterhead" style={{ borderBottom: '2px solid #1e3a5f', paddingBottom: '10px', marginBottom: '14px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                    <div>
-                        <div style={{ fontSize: '20px', fontWeight: '800', color: '#1e3a5f', letterSpacing: '0.5px' }}>
-                            Jifs Company &amp; Gen Supp Ltd
+            <div className="print-letterhead" style={{ marginBottom: '14px' }}>
+                {/* Gold top bar */}
+                <div style={{ height: '5px', background: 'linear-gradient(90deg, #c47f17, #a86c10, #7a4f0d)', marginBottom: '0' }}></div>
+
+                {/* Main header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0 8px', borderBottom: '2px solid #c47f17' }}>
+                    {/* Left: logo + name */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '48px', height: '48px', background: 'linear-gradient(135deg,#c47f17,#7a4f0d)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <svg width="28" height="28" fill="none" stroke="white" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 17h8M8 17v-4m8 4v-4m-8 0h8m-8 0V9a4 4 0 014-4h0a4 4 0 014 4v4" />
+                            </svg>
                         </div>
-                        <div style={{ fontSize: '11px', color: '#4b5563', marginTop: '3px' }}>Operations Report</div>
+                        <div>
+                            <div style={{ fontSize: '20px', fontWeight: '900', color: '#1a1200', letterSpacing: '0.3px', lineHeight: '1.1' }}>JIFS COMPANY &amp; GEN SUPP LTD</div>
+                            <div style={{ fontSize: '10px', fontWeight: '600', color: '#7a4f0d', letterSpacing: '1.2px', textTransform: 'uppercase', marginTop: '2px' }}>General Supplies &amp; Fleet Operations</div>
+                            <div style={{ fontSize: '10px', color: '#6b7280', marginTop: '1px' }}>Ngara - Kagera, Tanzania &nbsp;·&nbsp; P.O.Box 14, Ngara &nbsp;·&nbsp; +255 767 223 819</div>
+                        </div>
                     </div>
-                    <div style={{ textAlign: 'right', fontSize: '11px', color: '#4b5563', lineHeight: '1.6' }}>
-                        <div>P.O.Box 14, Ngara</div>
-                        <div>+255 784 223 819</div>
-                        <div>Printed: {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                    {/* Right: doc info */}
+                    <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '13px', fontWeight: '800', color: '#1a1200', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Operations Report</div>
+                        <div style={{ fontSize: '10px', color: '#6b7280', marginTop: '3px', lineHeight: '1.7' }}>
+                            <div><strong>TIN:</strong> 120-617-982</div>
+                            <div><strong>Printed:</strong> {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                        </div>
                     </div>
                 </div>
+                {/* Gold bottom accent */}
+                <div style={{ height: '2px', background: 'linear-gradient(90deg, #c47f17 0%, rgba(196,127,23,0.2) 100%)' }}></div>
             </div>
 
             <div className="animate-fade-in">

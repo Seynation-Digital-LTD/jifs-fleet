@@ -1,6 +1,6 @@
 const express = require('express');
 const { db } = require('../config/db');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { isAuthenticated, hasPerm } = require('../middleware/auth');
 const { auditLog } = require('../middleware/security');
 
 const router = express.Router();
@@ -133,7 +133,7 @@ router.put('/:id', isAuthenticated, (req, res) => {
 });
 
 // DELETE service
-router.delete('/:id', isAdmin, (req, res) => {
+router.delete('/:id', hasPerm('services.delete'), (req, res) => {
     try {
         const { id } = req.params;
         

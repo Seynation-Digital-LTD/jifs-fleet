@@ -1,0 +1,120 @@
+Rebuilding native modules...
+rebuilt dependencies successfully
+Thu Apr 23 08:19:47 EAT 2026: Starting JIFS Fleet server...
+Backend PID: 48768
+◇ injected env (2) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+Database initialized
+Audit logs table ready
+Server running on http://localhost:3000 (LAN: http://[your-ip]:3000)
+JIFS Fleet running at http://localhost:3000 | LAN: http://192.168.1.202:3000
+Rebuilding native modules...
+rebuilt dependencies successfully
+Thu Apr 23 08:20:31 EAT 2026: Starting JIFS Fleet server...
+Backend PID: 49526
+◇ injected env (2) from .env // tip: ⌘ enable debugging { debug: true }
+Database initialized
+Audit logs table ready
+Server running on http://localhost:3000 (LAN: http://[your-ip]:3000)
+JIFS Fleet running at http://localhost:3000 | LAN: http://192.168.1.202:3000
+Rebuilding native modules...
+rebuilt dependencies successfully
+Thu Apr 23 08:21:05 EAT 2026: Starting JIFS Fleet server...
+Backend PID: 50263
+◇ injected env (2) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+Database initialized
+Migration: added suppliers.type_label
+Migration: added parts.serial_number
+Migration: added users.failed_attempts
+Migration: added users.locked_until
+Audit logs table ready
+Server running on http://localhost:3000 (LAN: http://[your-ip]:3000)
+JIFS Fleet running at http://localhost:3000 | LAN: http://192.168.1.202:3000
+Rebuilding native modules...
+rebuilt dependencies successfully
+Thu Apr 23 10:47:35 EAT 2026: Starting JIFS Fleet server...
+Backend PID: 51768
+◇ injected env (2) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+Database initialized
+Audit logs table ready
+Server running on http://localhost:3000 (LAN: http://[your-ip]:3000)
+JIFS Fleet running at http://localhost:3000 | LAN: http://192.168.100.86:3000
+Rebuilding native modules...
+rebuilt dependencies successfully
+Thu Apr 23 10:48:46 EAT 2026: Starting JIFS Fleet server...
+Backend PID: 52518
+◇ injected env (2) from .env // tip: ⌘ enable debugging { debug: true }
+Database initialized
+Migration: added suppliers.type_label
+Migration: added parts.serial_number
+Migration: added users.failed_attempts
+Migration: added users.locked_until
+Audit logs table ready
+Server running on http://localhost:3000 (LAN: http://[your-ip]:3000)
+JIFS Fleet running at http://localhost:3000 | LAN: http://192.168.100.86:3000
+Rebuilding native modules...
+rebuilt dependencies successfully
+Thu Apr 23 12:40:40 EAT 2026: Starting JIFS Fleet server...
+Backend PID: 55623
+◇ injected env (2) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+Database initialized
+Audit logs table ready
+Server running on http://localhost:3000 (LAN: http://[your-ip]:3000)
+JIFS Fleet running at http://localhost:3000 | LAN: http://192.168.88.76:3000
+Rebuilding native modules...
+rebuilt dependencies successfully
+Thu Apr 23 12:41:25 EAT 2026: Starting JIFS Fleet server...
+Backend PID: 56359
+◇ injected env (2) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+Database initialized
+Migration: added suppliers.type_label
+Migration: added parts.serial_number
+Migration: added users.failed_attempts
+Migration: added users.locked_until
+Audit logs table ready
+Server running on http://localhost:3000 (LAN: http://[your-ip]:3000)
+JIFS Fleet running at http://localhost:3000 | LAN: http://192.168.88.76:3000
+Rebuilding native modules...
+rebuilt dependencies successfully
+Sat Apr 25 19:17:05 EAT 2026: Starting JIFS Fleet server...
+Backend PID: 97827
+◇ injected env (2) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+Database initialized
+Audit logs table ready
+Server running on http://localhost:3000 (LAN: http://[your-ip]:3000)
+JIFS Fleet running at http://localhost:3000 | LAN: http://192.168.1.202:3000
+Rebuilding native modules...
+rebuilt dependencies successfully
+Sun Apr 26 12:25:00 EAT 2026: Starting JIFS Fleet server...
+Backend PID: 7061
+◇ injected env (2) from .env // tip: ⌘ enable debugging { debug: true }
+Database initialized
+Migration: added users.permissions
+Audit logs table ready
+Server running on http://localhost:3000 (LAN: http://[your-ip]:3000)
+JIFS Fleet running at http://localhost:3000 | LAN: http://192.168.1.202:3000
+Rebuilding native modules...
+rebuilt dependencies successfully
+Sun Apr 26 13:13:32 EAT 2026: Starting JIFS Fleet server...
+Backend PID: 9458
+◇ injected env (2) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+Database initialized
+Migration: added suppliers.tin_no
+Migration: added suppliers.vrn_no
+Migration: added suppliers.billing_address
+Migration: added suppliers.email
+Migration: added suppliers.salesman
+Migration: added suppliers.salesman_contact
+Migration: added suppliers.logo_data
+Audit logs table ready
+Server running on http://localhost:3000 (LAN: http://[your-ip]:3000)
+JIFS Fleet running at http://localhost:3000 | LAN: http://192.168.0.180:3000
+Rebuilding native modules...
+rebuilt dependencies successfully
+Sun Apr 26 22:21:45 EAT 2026: Starting JIFS Fleet server...
+Backend PID: 11847
+◇ injected env (2) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+Database initialized
+Migration: expenses.vehicle_id is now nullable
+Audit logs table ready
+Server running on http://localhost:3000 (LAN: http://[your-ip]:3000)
+JIFS Fleet running at http://localhost:3000 | LAN: http://192.168.1.202:3000

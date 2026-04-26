@@ -1,6 +1,6 @@
 const express = require('express');
 const { db } = require('../config/db');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { isAuthenticated, isAdmin, hasPerm } = require('../middleware/auth');
 const { auditLog } = require('../middleware/security');
 
 const router = express.Router();
@@ -31,21 +31,22 @@ router.get('/:id', isAuthenticated, (req, res) => {
 });
 
 // POST create supplier
-router.post('/', isAuthenticated, (req, res) => {
+router.post('/', hasPerm('suppliers.write'), (req, res) => {
     try {
-        const { name, contact, type, type_label } = req.body;
+        const { name, contact, type, type_label, tin_no, vrn_no, billing_address, email, salesman, salesman_contact, logo_data } = req.body;
 
         if (!name) {
             return res.status(400).json({ error: 'Supplier name is required' });
         }
 
-        const stmt = db.prepare('INSERT INTO suppliers (name, contact, type, type_label) VALUES (?, ?, ?, ?)');
-        const result = stmt.run(name, contact || null, type || 'other', type_label || null);
+        const result = db.prepare(`
+            INSERT INTO suppliers (name, contact, type, type_label, tin_no, vrn_no, billing_address, email, salesman, salesman_contact, logo_data)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(name, contact || null, type || 'other', type_label || null,
+               tin_no || null, vrn_no || null, billing_address || null, email || null,
+               salesman || null, salesman_contact || null, logo_data || null);
 
-        res.status(201).json({
-            message: 'Supplier created',
-            supplierId: result.lastInsertRowid
-        });
+        res.status(201).json({ message: 'Supplier created', supplierId: result.lastInsertRowid });
     } catch (error) {
         console.error('Create supplier error:', error);
         res.status(500).json({ error: 'Server error' });
@@ -53,22 +54,30 @@ router.post('/', isAuthenticated, (req, res) => {
 });
 
 // PUT update supplier
-router.put('/:id', isAdmin, (req, res) => {
+router.put('/:id', hasPerm('suppliers.write'), (req, res) => {
     try {
         const { id } = req.params;
-        const { name, contact, type, type_label } = req.body;
+        const { name, contact, type, type_label, tin_no, vrn_no, billing_address, email, salesman, salesman_contact, logo_data } = req.body;
 
-        const existing = db.prepare('SELECT * FROM suppliers WHERE id = ?').get(id);
-        if (!existing) {
-            return res.status(404).json({ error: 'Supplier not found' });
-        }
+        const e = db.prepare('SELECT * FROM suppliers WHERE id = ?').get(id);
+        if (!e) return res.status(404).json({ error: 'Supplier not found' });
 
-        const stmt = db.prepare('UPDATE suppliers SET name = ?, contact = ?, type = ?, type_label = ? WHERE id = ?');
-        stmt.run(
-            name || existing.name,
-            contact !== undefined ? contact : existing.contact,
-            type || existing.type,
-            type_label !== undefined ? type_label : existing.type_label,
+        db.prepare(`
+            UPDATE suppliers SET name=?, contact=?, type=?, type_label=?,
+            tin_no=?, vrn_no=?, billing_address=?, email=?, salesman=?, salesman_contact=?, logo_data=?
+            WHERE id=?
+        `).run(
+            name || e.name,
+            contact !== undefined ? contact : e.contact,
+            type || e.type,
+            type_label !== undefined ? type_label : e.type_label,
+            tin_no !== undefined ? tin_no : e.tin_no,
+            vrn_no !== undefined ? vrn_no : e.vrn_no,
+            billing_address !== undefined ? billing_address : e.billing_address,
+            email !== undefined ? email : e.email,
+            salesman !== undefined ? salesman : e.salesman,
+            salesman_contact !== undefined ? salesman_contact : e.salesman_contact,
+            logo_data !== undefined ? logo_data : e.logo_data,
             id
         );
 

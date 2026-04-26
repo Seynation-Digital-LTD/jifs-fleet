@@ -1,6 +1,6 @@
 const express = require('express');
 const { db } = require('../config/db');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { isAuthenticated, hasPerm } = require('../middleware/auth');
 const { auditLog } = require('../middleware/security');
 
 const router = express.Router();
@@ -58,20 +58,34 @@ router.get('/vehicle/:vehicleId', isAuthenticated, (req, res) => {
 router.get('/statement', isAuthenticated, (req, res) => {
     try {
         const { supplier_id, start, end } = req.query;
-        const whereClauses = [];
-        const params = [];
+        const supplierIds = supplier_id
+            ? supplier_id.split(',').map(id => parseInt(id.trim(), 10)).filter(Boolean)
+            : [];
 
-        if (start) { whereClauses.push('e.date >= ?'); params.push(start); }
-        if (end) { whereClauses.push('e.date <= ?'); params.push(end); }
-        if (supplier_id) {
-            const ids = supplier_id.split(',').map(id => parseInt(id.trim(), 10)).filter(Boolean);
-            if (ids.length > 0) {
-                whereClauses.push(`e.supplier_id IN (${ids.map(() => '?').join(',')})`);
-                params.push(...ids);
-            }
+        const supplierClause = supplierIds.length > 0
+            ? `AND e.supplier_id IN (${supplierIds.map(() => '?').join(',')})`
+            : '';
+
+        // Opening balance: sum of all transactions BEFORE start date
+        let opening_balance = 0;
+        if (start) {
+            const obParams = [];
+            if (supplierIds.length > 0) obParams.push(...supplierIds);
+            obParams.push(start);
+            const ob = db.prepare(`
+                SELECT COALESCE(SUM(e.debit),0) - COALESCE(SUM(e.credit),0) as bal
+                FROM expenses e
+                WHERE 1=1 ${supplierClause} AND e.date < ?
+            `).get(...obParams);
+            opening_balance = ob?.bal || 0;
         }
 
-        const whereSQL = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+        // Main period transactions
+        const whereClauses = ['1=1'];
+        const params = [];
+        if (supplierIds.length > 0) { whereClauses.push(`e.supplier_id IN (${supplierIds.map(() => '?').join(',')})`); params.push(...supplierIds); }
+        if (start) { whereClauses.push('e.date >= ?'); params.push(start); }
+        if (end)   { whereClauses.push('e.date <= ?'); params.push(end); }
 
         const rows = db.prepare(`
             SELECT e.id, e.date, e.due_date, e.document_no, e.reference_no,
@@ -81,11 +95,11 @@ router.get('/statement', isAuthenticated, (req, res) => {
             FROM expenses e
             LEFT JOIN vehicles v ON e.vehicle_id = v.id
             LEFT JOIN suppliers s ON e.supplier_id = s.id
-            ${whereSQL}
+            WHERE ${whereClauses.join(' AND ')}
             ORDER BY e.date ASC, e.id ASC
         `).all(...params);
 
-        let running = 0, total_debit = 0, total_credit = 0;
+        let running = opening_balance, total_debit = 0, total_credit = 0;
         const statement = rows.map(row => {
             const debit = row.debit || 0;
             const credit = row.credit || 0;
@@ -95,7 +109,11 @@ router.get('/statement', isAuthenticated, (req, res) => {
             return { ...row, running_balance: running };
         });
 
-        res.json({ statement, summary: { total_debit, total_credit, final_balance: running } });
+        res.json({
+            statement,
+            opening_balance,
+            summary: { total_debit, total_credit, final_balance: running },
+        });
     } catch (error) {
         console.error('Get statement error:', error);
         res.status(500).json({ error: 'Server error' });
@@ -125,24 +143,27 @@ router.post('/', isAuthenticated, (req, res) => {
     try {
         const {
             vehicle_id, supplier_id, date, due_date, reference_no,
-            expense_type, item_description, quantity, unit, debit, credit,
+            expense_type, expense_type_other, item_description, quantity, unit, debit, credit,
             odometer_km, payment_status, notes
         } = req.body;
 
-        if (!vehicle_id || !date || !expense_type) {
-            return res.status(400).json({ error: 'Vehicle, date, and expense type are required' });
+        if (!date || !expense_type) {
+            return res.status(400).json({ error: 'Date and expense type are required' });
         }
-        const vehicle = db.prepare('SELECT id FROM vehicles WHERE id = ?').get(vehicle_id);
-        if (!vehicle) return res.status(400).json({ error: 'Vehicle not found' });
+        if (vehicle_id) {
+            const vehicle = db.prepare('SELECT id FROM vehicles WHERE id = ?').get(vehicle_id);
+            if (!vehicle) return res.status(400).json({ error: 'Vehicle not found' });
+        }
 
         const result = db.prepare(`
             INSERT INTO expenses
-            (vehicle_id, supplier_id, date, due_date, reference_no, expense_type,
+            (vehicle_id, supplier_id, date, due_date, reference_no, expense_type, expense_type_other,
              item_description, quantity, unit, debit, credit, odometer_km, payment_status, notes, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-            vehicle_id, supplier_id || null, date, due_date || null, reference_no || null,
-            expense_type, item_description || null, quantity || null, unit || null,
+            vehicle_id || null, supplier_id || null, date, due_date || null, reference_no || null,
+            expense_type, expense_type === 'other' ? (expense_type_other || null) : null,
+            item_description || null, quantity || null, unit || null,
             debit || 0, credit || 0, odometer_km || null,
             payment_status || 'unpaid', notes || null, req.session.user.id
         );
@@ -166,26 +187,28 @@ router.put('/:id', isAuthenticated, (req, res) => {
         const { id } = req.params;
         const {
             vehicle_id, supplier_id, date, due_date, reference_no,
-            expense_type, item_description, quantity, unit, debit, credit,
+            expense_type, expense_type_other, item_description, quantity, unit, debit, credit,
             odometer_km, payment_status, notes
         } = req.body;
 
         const existing = db.prepare('SELECT * FROM expenses WHERE id = ?').get(id);
         if (!existing) return res.status(404).json({ error: 'Expense not found' });
 
+        const resolvedType = expense_type || existing.expense_type;
         db.prepare(`
             UPDATE expenses SET
                 vehicle_id = ?, supplier_id = ?, date = ?, due_date = ?, reference_no = ?,
-                expense_type = ?, item_description = ?, quantity = ?, unit = ?,
+                expense_type = ?, expense_type_other = ?, item_description = ?, quantity = ?, unit = ?,
                 debit = ?, credit = ?, odometer_km = ?, payment_status = ?, notes = ?
             WHERE id = ?
         `).run(
-            vehicle_id || existing.vehicle_id,
+            vehicle_id !== undefined ? (vehicle_id || null) : existing.vehicle_id,
             supplier_id !== undefined ? (supplier_id || null) : existing.supplier_id,
             date || existing.date,
             due_date !== undefined ? (due_date || null) : existing.due_date,
             reference_no !== undefined ? reference_no : existing.reference_no,
-            expense_type || existing.expense_type,
+            resolvedType,
+            resolvedType === 'other' ? (expense_type_other !== undefined ? (expense_type_other || null) : existing.expense_type_other) : null,
             item_description !== undefined ? item_description : existing.item_description,
             quantity !== undefined ? quantity : existing.quantity,
             unit !== undefined ? unit : existing.unit,
@@ -205,7 +228,7 @@ router.put('/:id', isAuthenticated, (req, res) => {
 });
 
 // DELETE expense
-router.delete('/:id', isAdmin, (req, res) => {
+router.delete('/:id', hasPerm('expenses.delete'), (req, res) => {
     try {
         const { id } = req.params;
         const existing = db.prepare('SELECT reference_no, date FROM expenses WHERE id = ?').get(id);

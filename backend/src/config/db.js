@@ -15,19 +15,61 @@ const initDb = () => {
     db.exec(schema);
     console.log('Database initialized');
 
-    // Migrate expenses table
+    // Migrate expenses table — add missing columns
     const expenseColumns = db.pragma('table_info(expenses)').map(col => col.name);
     const expenseMigrations = [
         { name: 'document_no',     sql: 'ALTER TABLE expenses ADD COLUMN document_no TEXT' },
         { name: 'due_date',        sql: 'ALTER TABLE expenses ADD COLUMN due_date DATE' },
         { name: 'item_description',sql: 'ALTER TABLE expenses ADD COLUMN item_description TEXT' },
         { name: 'odometer_km',     sql: 'ALTER TABLE expenses ADD COLUMN odometer_km REAL' },
-        { name: 'payment_status',  sql: "ALTER TABLE expenses ADD COLUMN payment_status TEXT DEFAULT 'unpaid'" },
+        { name: 'payment_status',    sql: "ALTER TABLE expenses ADD COLUMN payment_status TEXT DEFAULT 'unpaid'" },
+        { name: 'expense_type_other', sql: 'ALTER TABLE expenses ADD COLUMN expense_type_other TEXT' },
     ];
     for (const m of expenseMigrations) {
         if (!expenseColumns.includes(m.name)) {
             try { db.exec(m.sql); console.log(`Migration: added expenses.${m.name}`); }
             catch (err) { console.error(`Migration error expenses.${m.name}:`, err.message); }
+        }
+    }
+
+    // Make vehicle_id nullable — rebuild table if currently NOT NULL
+    const vehicleCol = db.pragma('table_info(expenses)').find(c => c.name === 'vehicle_id');
+    if (vehicleCol && vehicleCol.notnull === 1) {
+        try {
+            db.pragma('foreign_keys = OFF');
+            db.exec(`
+                CREATE TABLE expenses_new (
+                    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+                    vehicle_id       INTEGER,
+                    supplier_id      INTEGER,
+                    date             DATE NOT NULL,
+                    due_date         DATE,
+                    document_no      TEXT,
+                    reference_no     TEXT,
+                    expense_type     TEXT NOT NULL,
+                    item_description TEXT,
+                    quantity         REAL,
+                    unit             TEXT,
+                    debit            REAL DEFAULT 0,
+                    credit           REAL DEFAULT 0,
+                    odometer_km      REAL,
+                    payment_status   TEXT DEFAULT 'unpaid',
+                    notes            TEXT,
+                    created_by       INTEGER,
+                    created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (vehicle_id)  REFERENCES vehicles(id),
+                    FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
+                    FOREIGN KEY (created_by)  REFERENCES users(id)
+                );
+                INSERT INTO expenses_new SELECT * FROM expenses;
+                DROP TABLE expenses;
+                ALTER TABLE expenses_new RENAME TO expenses;
+            `);
+            db.pragma('foreign_keys = ON');
+            console.log('Migration: expenses.vehicle_id is now nullable');
+        } catch (err) {
+            db.pragma('foreign_keys = ON');
+            console.error('Migration error (vehicle_id nullable):', err.message);
         }
     }
 
@@ -46,7 +88,14 @@ const initDb = () => {
     // Migrate suppliers table
     const supplierColumns = db.pragma('table_info(suppliers)').map(col => col.name);
     const supplierMigrations = [
-        { name: 'type_label', sql: 'ALTER TABLE suppliers ADD COLUMN type_label TEXT' },
+        { name: 'type_label',       sql: 'ALTER TABLE suppliers ADD COLUMN type_label TEXT' },
+        { name: 'tin_no',           sql: 'ALTER TABLE suppliers ADD COLUMN tin_no TEXT' },
+        { name: 'vrn_no',           sql: 'ALTER TABLE suppliers ADD COLUMN vrn_no TEXT' },
+        { name: 'billing_address',  sql: 'ALTER TABLE suppliers ADD COLUMN billing_address TEXT' },
+        { name: 'email',            sql: 'ALTER TABLE suppliers ADD COLUMN email TEXT' },
+        { name: 'salesman',         sql: 'ALTER TABLE suppliers ADD COLUMN salesman TEXT' },
+        { name: 'salesman_contact', sql: 'ALTER TABLE suppliers ADD COLUMN salesman_contact TEXT' },
+        { name: 'logo_data',        sql: 'ALTER TABLE suppliers ADD COLUMN logo_data TEXT' },
     ];
     for (const m of supplierMigrations) {
         if (!supplierColumns.includes(m.name)) {
@@ -72,6 +121,7 @@ const initDb = () => {
     const userMigrations = [
         { name: 'failed_attempts', sql: 'ALTER TABLE users ADD COLUMN failed_attempts INTEGER DEFAULT 0' },
         { name: 'locked_until',    sql: 'ALTER TABLE users ADD COLUMN locked_until TEXT NULL' },
+        { name: 'permissions',     sql: 'ALTER TABLE users ADD COLUMN permissions TEXT NULL' },
     ];
     for (const m of userMigrations) {
         if (!userColumns.includes(m.name)) {

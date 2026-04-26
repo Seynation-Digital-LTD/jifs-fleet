@@ -1,6 +1,6 @@
 const express = require('express');
 const { db } = require('../config/db');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { isAuthenticated, isAdmin, hasPerm } = require('../middleware/auth');
 const { auditLog } = require('../middleware/security');
 
 const router = express.Router();
@@ -26,7 +26,7 @@ router.get('/:id', isAuthenticated, (req, res) => {
     }
 });
 
-router.post('/', isAdmin, (req, res) => {
+router.post('/', hasPerm('vehicles.write'), (req, res) => {
     try {
         const { plate_no, vehicle_type, make_model, year, status, monthly_budget } = req.body;
         if (!plate_no) return res.status(400).json({ error: 'Plate number is required' });
@@ -45,7 +45,7 @@ router.post('/', isAdmin, (req, res) => {
     }
 });
 
-router.put('/:id', isAdmin, (req, res) => {
+router.put('/:id', hasPerm('vehicles.write'), (req, res) => {
     try {
         const { id } = req.params;
         const { plate_no, vehicle_type, make_model, year, status, monthly_budget } = req.body;

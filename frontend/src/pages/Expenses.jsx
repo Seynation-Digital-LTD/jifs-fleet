@@ -32,6 +32,7 @@ const Expenses = () => {
         due_date: '',
         reference_no: '',
         expense_type: 'fuel',
+        expense_type_other: '',
         item_description: '',
         quantity: '',
         unit: '',
@@ -93,6 +94,7 @@ const Expenses = () => {
             due_date: expense.due_date || '',
             reference_no: expense.reference_no || '',
             expense_type: expense.expense_type,
+            expense_type_other: expense.expense_type_other || '',
             item_description: expense.item_description || '',
             quantity: expense.quantity || '',
             unit: expense.unit || '',
@@ -116,6 +118,7 @@ const Expenses = () => {
             due_date: '',
             reference_no: '',
             expense_type: expense.expense_type,
+            expense_type_other: expense.expense_type_other || '',
             item_description: expense.item_description || '',
             quantity: expense.quantity || '',
             unit: expense.unit || '',
@@ -151,6 +154,7 @@ const Expenses = () => {
             due_date: '',
             reference_no: '',
             expense_type: 'fuel',
+            expense_type_other: '',
             item_description: '',
             quantity: '',
             unit: '',
@@ -277,9 +281,9 @@ const Expenses = () => {
                         {/* Row 1 */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Vehicle *</label>
-                                <select value={formData.vehicle_id} onChange={e => setFormData({ ...formData, vehicle_id: e.target.value })} className="input select" required>
-                                    <option value="">Select Vehicle</option>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Vehicle <span className="text-gray-400 font-normal">(optional)</span></label>
+                                <select value={formData.vehicle_id} onChange={e => setFormData({ ...formData, vehicle_id: e.target.value })} className="input select">
+                                    <option value="">— External / No Vehicle —</option>
                                     {vehicles.map(v => <option key={v.id} value={v.id}>{v.plate_no}</option>)}
                                 </select>
                             </div>
@@ -317,7 +321,7 @@ const Expenses = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Type *</label>
-                                <select value={formData.expense_type} onChange={e => setFormData({ ...formData, expense_type: e.target.value })} className="input select" required>
+                                <select value={formData.expense_type} onChange={e => setFormData({ ...formData, expense_type: e.target.value, expense_type_other: '' })} className="input select" required>
                                     <option value="fuel">Fuel</option>
                                     <option value="maintenance">Maintenance</option>
                                     <option value="insurance">Insurance</option>
@@ -325,6 +329,20 @@ const Expenses = () => {
                                     <option value="other">Other</option>
                                 </select>
                             </div>
+                            {formData.expense_type === 'other' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Specify Type *</label>
+                                    <input
+                                        type="text"
+                                        value={formData.expense_type_other}
+                                        onChange={e => setFormData({ ...formData, expense_type_other: e.target.value })}
+                                        placeholder="e.g. Canopy repair, Washing, Toll fee…"
+                                        className="input"
+                                        required
+                                        autoFocus
+                                    />
+                                </div>
+                            )}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Payment Status</label>
                                 <select value={formData.payment_status} onChange={e => setFormData({ ...formData, payment_status: e.target.value })} className="input select">
@@ -385,14 +403,7 @@ const Expenses = () => {
                     </div>
                 ) : filteredExpenses.length === 0 ? (
                     <div className="text-center py-12 px-6">
-                        {expenses.length === 0 && vehicles.length === 0 ? (
-                            <>
-                                <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                <p className="text-gray-700 font-medium mb-1">Set up your trucks first</p>
-                                <p className="text-gray-500 text-sm mb-4">Each transaction is linked to a truck. Add your vehicles before logging expenses.</p>
-                                <Link to="/vehicles" className="btn btn-primary inline-flex">Go to Vehicles →</Link>
-                            </>
-                        ) : expenses.length === 0 && suppliers.length === 0 ? (
+                        {expenses.length === 0 && suppliers.length === 0 ? (
                             <>
                                 <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 <p className="text-gray-700 font-medium mb-1">Add at least one supplier</p>
@@ -440,7 +451,7 @@ const Expenses = () => {
                                         <td className="font-medium text-gray-900">{expense.plate_no}</td>
                                         <td className="text-gray-600">{expense.supplier_name || '-'}</td>
                                         <td className="text-gray-700 max-w-48 truncate" title={expense.item_description}>{expense.item_description || '-'}</td>
-                                        <td><span className={`badge ${typeColors[expense.expense_type]}`}>{expense.expense_type}</span></td>
+                                        <td><span className={`badge ${typeColors[expense.expense_type]}`}>{expense.expense_type === 'other' && expense.expense_type_other ? expense.expense_type_other : expense.expense_type}</span></td>
                                         <td className="text-right text-gray-500 text-sm">{expense.odometer_km ? new Intl.NumberFormat('en-TZ').format(expense.odometer_km) : '-'}</td>
                                         <td className="text-right font-medium text-red-600">{expense.debit ? formatCurrency(expense.debit) : '-'}</td>
                                         <td className="text-right font-medium text-green-600">{expense.credit ? formatCurrency(expense.credit) : '-'}</td>

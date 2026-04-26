@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS suppliers (
 -- Expenses table
 CREATE TABLE IF NOT EXISTS expenses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    vehicle_id INTEGER NOT NULL,
+    vehicle_id INTEGER,
     supplier_id INTEGER,
     date DATE NOT NULL,
     due_date DATE,

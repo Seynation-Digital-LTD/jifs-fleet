@@ -128,7 +128,8 @@ router.post('/login', loginRateLimiter, async (req, res) => {
                 return res.status(500).json({ error: 'Session error' });
             }
 
-            req.session.user = { id: user.id, username: user.username, role: user.role };
+            const permissions = user.permissions ? JSON.parse(user.permissions) : null;
+            req.session.user = { id: user.id, username: user.username, role: user.role, permissions };
             auditLog('LOGIN_SUCCESS', `Login: ${username}`, user.id, req);
 
             res.json({ message: 'Login successful', user: req.session.user });
@@ -193,9 +194,13 @@ const { isAdmin } = require('../middleware/auth');
 router.get('/users', isAdmin, (req, res) => {
     try {
         const users = db.prepare(
-            'SELECT id, username, role, created_at, failed_attempts, locked_until FROM users ORDER BY id ASC'
+            'SELECT id, username, role, permissions, created_at, failed_attempts, locked_until FROM users ORDER BY id ASC'
         ).all();
-        res.json({ users });
+        const parsed = users.map(u => ({
+            ...u,
+            permissions: u.permissions ? JSON.parse(u.permissions) : null,
+        }));
+        res.json({ users: parsed });
     } catch (error) {
         console.error('List users error:', error);
         res.status(500).json({ error: 'Server error' });
@@ -205,7 +210,7 @@ router.get('/users', isAdmin, (req, res) => {
 // ── POST /users — create user (admin only) ────────────────────────────────────
 router.post('/users', isAdmin, async (req, res) => {
     try {
-        const { username, password, role } = req.body;
+        const { username, password, role, permissions } = req.body;
 
         if (!username || !password) {
             return res.status(400).json({ error: 'Username and password are required' });
@@ -224,10 +229,14 @@ router.post('/users', isAdmin, async (req, res) => {
             return res.status(409).json({ error: 'Username already taken' });
         }
 
+        const permJson = (role === 'operator' && Array.isArray(permissions))
+            ? JSON.stringify(permissions)
+            : null;
+
         const hashed = await bcrypt.hash(password, 10);
         const result = db.prepare(
-            'INSERT INTO users (username, password, role) VALUES (?, ?, ?)'
-        ).run(username, hashed, role);
+            'INSERT INTO users (username, password, role, permissions) VALUES (?, ?, ?, ?)'
+        ).run(username, hashed, role, permJson);
 
         auditLog('CREATE_USER', `Admin created user: ${username} (${role})`, req.session.user.id, req);
         res.status(201).json({ message: 'User created', userId: result.lastInsertRowid });
@@ -252,6 +261,14 @@ router.put('/users/:id', isAdmin, async (req, res) => {
             }
             db.prepare('UPDATE users SET role = ? WHERE id = ?').run(role, id);
             auditLog('UPDATE_USER_ROLE', `Changed role of ${user.username} to ${role}`, req.session.user.id, req);
+        }
+
+        if (req.body.permissions !== undefined) {
+            const permJson = (Array.isArray(req.body.permissions))
+                ? JSON.stringify(req.body.permissions)
+                : null;
+            db.prepare('UPDATE users SET permissions = ? WHERE id = ?').run(permJson, id);
+            auditLog('UPDATE_USER_PERMS', `Updated permissions for ${user.username}`, req.session.user.id, req);
         }
 
         if (password) {
